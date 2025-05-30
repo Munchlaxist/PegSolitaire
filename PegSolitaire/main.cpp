@@ -13,9 +13,9 @@ static const std::array<std::array<int, 7>, 7> defaultBoard = { {
 } };
 
 
-class SolvePegSolitaire {
+class PegSolitaireSolver {
 private:
-	std::array<std::array<int, 7>, 7>& m_board_state;
+	std::array<std::array<int, 7>, 7>& m_board_state; // representation of the 7x7 board
 	int m_moves{ 0 };
 	
 
@@ -27,9 +27,12 @@ public:
 		Right
 	};
 
-	SolvePegSolitaire(std::array<std::array<int, 7>, 7> board_state = defaultBoard) : m_board_state{ board_state } {};
+	PegSolitaireSolver(std::array<std::array<int, 7>, 7> board_state = defaultBoard) : m_board_state{ board_state } {};
 
 	const std::string_view getDirectionString(const Direction& direction) const {
+		/**
+		* get the string representation of the direction.
+		*/
 		switch (direction) {
 		case Direction::Up:
 			return "Up";
@@ -45,18 +48,29 @@ public:
 	}
 
 	bool foundSolution() {
-		int peg_count = 0;
+		/**
+		* check if the current board state is the solution board state.
+		*/
 		for (std::size_t row = 0; row < 7; ++row) {
 			for (std::size_t col = 0; col < 7; ++col) {
 				if (m_board_state[row][col] == 1) {
-					++peg_count;
+					if (row == 3 && col == 3) {
+						continue;
+					}
+					else {
+						return false;
+					}
 				}
 			}
 		}
-		return (peg_count == 1 && m_board_state[3][3] == 1);
+		return true;
+		
 	}
 
 	bool isValidMove(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
+		/**
+		* check if the next move is valid, i.e. the peg can jump over another peg and land in an empty space.
+		*/
 		switch (direction) {
 		case Direction::Up:
 			if (position.first < 2 || m_board_state[position.first - 1][position.second] != 1 || m_board_state[position.first - 2][position.second] != 0) {
@@ -86,6 +100,9 @@ public:
 	}
 
 	void makeMove(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
+		/**
+		* make the given move by updating the board state.
+		*/
 		switch (direction) {
 		case Direction::Up:
 			m_board_state[position.first][position.second] = 0;
@@ -114,6 +131,9 @@ public:
 	}
 
 	void undoMove(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
+		/**
+		* undo the given move by reverting the board state to its previous state.
+		*/
 		switch (direction) {
 		case Direction::Up:
 			m_board_state[position.first][position.second] = 1;
@@ -142,6 +162,9 @@ public:
 	}
 
 	void printMove(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
+		/**
+		* print the move made in a human-readable format.
+		*/
 		switch (direction) {
 		case Direction::Up:
 			std::cout << "Jump " << getDirectionString(direction) << " from (" << position.first << ", " << position.second << ") to (" << position.first-2 << ", " << position.second << ")." << std::endl;
@@ -162,8 +185,10 @@ public:
 	}
 
 	bool findSolution() {
+		/**
+		* find a solution to the peg solitaire puzzle using backtracking.
+		*/
 		if (foundSolution()) {
-			//TODO: print board state
 			return true;
 		}
 		for (std::size_t row = 0; row < 7; ++row) {
@@ -187,6 +212,9 @@ public:
 	}
 
 	void solvePegSolitaire() {
+		/**
+		* solve the peg solitaire puzzle and print the moves being made (if found).
+		*/
 		std::cout << "Solving Peg Solitaire..." << std::endl;
 		if (findSolution()) {
 			std::cout << "Solution found!" << std::endl;
@@ -200,7 +228,7 @@ public:
 };
 
 int main() {
-	// Initialize default board state
+	// Initialize board state - could be any valid state of the game
 	std::array<std::array<int, 7>, 7> board_state = { {
 		{-1, -1, 1, 1, 1, -1, -1},
 		{-1, -1, 1, 1, 1, -1, -1},
@@ -212,7 +240,7 @@ int main() {
 	} };
 
 	// Solve the peg solitaire puzzle
-	SolvePegSolitaire pegSolitaire(board_state);
+	PegSolitaireSolver pegSolitaire(board_state);
 	pegSolitaire.solvePegSolitaire();
     return 0;
 }
