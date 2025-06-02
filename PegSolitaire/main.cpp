@@ -1,6 +1,7 @@
 #include <iostream>
 #include <array>
 #include <string_view>
+#include <SFML/Graphics.hpp>
 
 static const std::array<std::array<int, 7>, 7> defaultBoard = { {
 	{-1, -1, 1, 1, 1, -1, -1},
@@ -227,6 +228,7 @@ public:
 
 };
 
+/*
 int main() {
 	// Initialize board state - could be any valid state of the game
 	std::array<std::array<int, 7>, 7> board_state = { {
@@ -243,4 +245,26 @@ int main() {
 	PegSolitaireSolver pegSolitaire(board_state);
 	pegSolitaire.solvePegSolitaire();
     return 0;
+}
+*/
+
+
+int main()
+{
+	sf::RenderWindow window(sf::VideoMode({ 200, 200 }), "SFML works!");
+	sf::CircleShape shape(100.f);
+	shape.setFillColor(sf::Color::Green);
+
+	while (window.isOpen())
+	{
+		while (const std::optional event = window.pollEvent())
+		{
+			if (event->is<sf::Event::Closed>())
+				window.close();
+		}
+
+		window.clear();
+		window.draw(shape);
+		window.display();
+	}
 }
