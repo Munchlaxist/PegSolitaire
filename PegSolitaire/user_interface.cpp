@@ -97,8 +97,9 @@ public:
 		m_window.draw(backgroundSprite);
 	}
 
-	void drawInitialBoard() {
-
+	void drawBoard() {
+		m_window.clear();
+		setBackground("white_oak_bg.png");
 		for (auto& peg : m_board) {
 			m_window.draw(peg.getCircle());
 		}
@@ -114,6 +115,118 @@ public:
 		return nullptr;
 	}
 
+	Peg* getSelectedPeg() {
+		for (auto& peg : m_board) {
+			if (peg.getState() == PegState::Selected) {
+				return &peg; // Return the selected peg
+			}
+		}
+		return nullptr;
+	}
+
+	bool isValidMove(Peg& selectedPeg, Peg& peg) {
+		/**
+		* check if the next move is valid, i.e. the selected peg can jump over another peg and land in an empty space given by peg.
+		*/
+		std::pair<int, int> selectedPegPosition = selectedPeg.getPosition();
+		std::pair<int, int> pegPosition = peg.getPosition();
+
+		if (std::get<0>(selectedPegPosition)-2 == std::get<0>(pegPosition) && std::get<1>(selectedPegPosition) == std::get<1>(pegPosition)) {
+			// then we jump up, check if there is an occupied peg in between. If so the move is valid
+			for (auto& p : m_board) {
+				if (p.getPosition() == std::make_pair(std::get<0>(selectedPegPosition)-1, std::get<1>(selectedPegPosition))) {
+					if (p.getState() == PegState::Occupied) {
+						return true; // Valid move
+					}
+				}
+			}
+			
+		}
+		else if (std::get<0>(selectedPegPosition)+2 == std::get<0>(pegPosition) && std::get<1>(selectedPegPosition) == std::get<1>(pegPosition)) {
+			// Check if there is a peg in between
+			for (auto& p : m_board) {
+				if (p.getPosition() == std::make_pair(std::get<0>(selectedPegPosition)+1, std::get<1>(selectedPegPosition))) {
+					if (p.getState() == PegState::Occupied) {
+						return true; // Valid move
+					}
+				}
+			}
+		}
+		else if (std::get<0>(selectedPegPosition) == std::get<0>(pegPosition) && std::get<1>(selectedPegPosition)-2 == std::get<1>(pegPosition)) {
+			// Check if there is a peg in between
+			for (auto& p : m_board) {
+				if (p.getPosition() == std::make_pair(std::get<0>(selectedPegPosition), std::get<1>(selectedPegPosition)-1)) {
+					if (p.getState() == PegState::Occupied) {
+						return true; // Valid move
+					}
+				}
+			}
+			
+		}
+		else if (std::get<0>(selectedPegPosition) == std::get<0>(pegPosition) && std::get<1>(selectedPegPosition) + 2 == std::get<1>(pegPosition)) {
+			// Check if there is a peg in between
+			for (auto& p : m_board) {
+				if (p.getPosition() == std::make_pair(std::get<0>(selectedPegPosition), std::get<1>(selectedPegPosition) + 1)) {
+					if (p.getState() == PegState::Occupied) {
+						return true; // Valid move
+					}
+				}
+			}
+		}
+		return false;
+
+	}
+
+	void makeMove(Peg& selectedPeg, Peg& peg) {
+		/**
+		* update and adapt the selected Peg, the peg that is jumped over and the peg that is landed on (given by peg).
+		*/
+		selectedPeg.setState(PegState::Empty);
+		selectedPeg.getCircle().setFillColor(sf::Color::Transparent); // Change color to indicate empty peg
+		peg.getCircle().setFillColor(sf::Color::Blue); // Change color to indicate occupied peg
+		peg.setState(PegState::Occupied);
+
+		if (selectedPeg.getPosition().first < peg.getPosition().first) {
+			// then we jumped down
+			for (auto& p : m_board) {
+				if (p.getPosition() == std::make_pair(selectedPeg.getPosition().first + 1, selectedPeg.getPosition().second)) {
+					p.setState(PegState::Empty);
+					p.getCircle().setFillColor(sf::Color::Transparent); // Change color to indicate empty peg
+				}
+			}
+		}
+		else if (selectedPeg.getPosition().first > peg.getPosition().first) {
+			// then we jumped up
+			for (auto& p : m_board) {
+				if (p.getPosition() == std::make_pair(selectedPeg.getPosition().first -1, selectedPeg.getPosition().second)) {
+					p.setState(PegState::Empty);
+					p.getCircle().setFillColor(sf::Color::Transparent); // Change color to indicate empty peg
+				}
+			}
+		}
+		else if (selectedPeg.getPosition().second < peg.getPosition().second) {
+			// then we jumped right
+			for (auto& p : m_board) {
+				if (p.getPosition() == std::make_pair(selectedPeg.getPosition().first, selectedPeg.getPosition().second +1 )) {
+					p.setState(PegState::Empty);
+					p.getCircle().setFillColor(sf::Color::Transparent); // Change color to indicate empty peg
+				}
+			}
+		}
+		else if (selectedPeg.getPosition().second > peg.getPosition().second) {
+			// then we jumped left
+			for (auto& p : m_board) {
+				if (p.getPosition() == std::make_pair(selectedPeg.getPosition().first, selectedPeg.getPosition().second - 1)) {
+					p.setState(PegState::Empty);
+					p.getCircle().setFillColor(sf::Color::Transparent); // Change color to indicate empty peg
+				}
+
+			}
+		}
+	}
+
+
+
 	void startGame() {
 		while (true) {
 
@@ -122,13 +235,19 @@ public:
 
 };
 
+enum class GameState {
+	Playing,
+	GameOver
+};
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode({ 800, 800 }), "Peg Solitaire");
 	window.clear();
 	UserInterface ui(window);
-	ui.setBackground("white_oak_bg.png");
-	ui.drawInitialBoard();
+	//ui.setBackground("white_oak_bg.png");
+	ui.drawBoard();
+	GameState gameState = GameState::Playing;
 
 	while (window.isOpen())
 	{
@@ -139,6 +258,8 @@ int main()
 				window.close();
 			}
 
+			if (gameState == GameState::Playing) {
+
 			if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
 				if (buttonPressed->button == sf::Mouse::Button::Left) {
 					// Handle mouse button pressed events here
@@ -147,12 +268,47 @@ int main()
 						std::cout << "Mouse button pressed at: " << mousePosition.x << ", " << mousePosition.y << std::endl;
 						// check if there is a peg already selected -> if so, check if the move is valid, if not mark current peg as selected and change color of circle
 						// if the move is valid, do the move and update the board (UPDATE POSITION OF CIRCLE ASWELL!!!), if not, just reset the seleted peg and circle color
-						
+						if (auto* selectedPeg = ui.getSelectedPeg()) {
+							// TODO check if the move is valid
+							if (peg->getState() == PegState::Empty) {
+								// check if the move is valid
+								if (ui.isValidMove(*selectedPeg, *peg)) {
+									ui.makeMove(*selectedPeg, *peg);
+									
+									// check if there are still valid moves left (if not, end the game)
+									//if (noValidMovesLeft()) {
+										// todo check if you won or lost
+									//	gameState = GameState::GameOver;
+									//}
+								}
+								else {
+									selectedPeg->setState(PegState::Occupied);
+									selectedPeg->getCircle().setFillColor(sf::Color::Blue);
+								}
+
+							}
+							else {
+								selectedPeg->setState(PegState::Occupied);
+								selectedPeg->getCircle().setFillColor(sf::Color::Blue);
+							}
+						}
+						else {
+							if (peg->getState() == PegState::Occupied) {
+								peg->setState(PegState::Selected);
+								peg->getCircle().setFillColor(sf::Color::Red); // Change color to indicate selection
+							}
+						}
+						ui.drawBoard();
+
 					}
-					
 				}
 			}
+			else {
+				// todo try again button with mouse click event
+			}
 		}
-	
+
+
+		}
 	}
 }
