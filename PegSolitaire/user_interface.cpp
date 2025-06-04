@@ -2,22 +2,38 @@
 #include <iostream>
 #include <array>
 
-static const std::array<std::array<int, 7>, 7> defaultBoard = { {
-	{-1, -1, 1, 1, 1, -1, -1},
-	{-1, -1, 1, 1, 1, -1, -1},
-	{ 1,  1, 1, 1, 1,  1,  1},
-	{ 1,  1, 1, 0, 1,  1,  1},
-	{ 1,  1, 1, 1, 1,  1,  1},
-	{-1, -1, 1, 1, 1, -1, -1},
-	{-1, -1, 1, 1, 1, -1, -1},
-} };
 
-enum class PegState {
+
+enum class FieldState {
 	Empty,
 	Occupied,
 	Selected,
 };
 
+class Field {
+private:
+	FieldState m_state{};
+	std::pair<int, int> m_position{};
+
+public:
+	Field(FieldState state = FieldState::Empty, std::pair<int, int> position = { 0,0 }) : m_state{ state }, m_position{ position } {}
+
+	FieldState& getState() {
+		return m_state;
+	}
+	const std::pair<int, int> getPosition() const {
+		return m_position;
+	}
+	void setState(FieldState state) {
+		m_state = state;
+	}
+
+	void setPosition(std::pair<int, int> position) {
+		m_position = position;
+	}
+};
+
+/*
 class Peg {
 private:
 	PegState m_state{};
@@ -45,12 +61,63 @@ public:
 	std::pair<int, int> getPosition() const { return m_position; }
 
 };
+*/
 
+class GameLogic {
+private:
+	std::array<Field, 33> m_board{};
+
+public:
+	static constexpr std::array<std::array<int, 7>, 7> defaultBoard { {
+	{-1, -1, 1, 1, 1, -1, -1},
+	{-1, -1, 1, 1, 1, -1, -1},
+	{ 1,  1, 1, 1, 1,  1,  1},
+	{ 1,  1, 1, 0, 1,  1,  1},
+	{ 1,  1, 1, 1, 1,  1,  1},
+	{-1, -1, 1, 1, 1, -1, -1},
+	{-1, -1, 1, 1, 1, -1, -1},
+	} };
+	GameLogic() {
+		// Initialize the game logic with the default board state
+		std::size_t index = 0;
+		for (std::size_t row = 0; row < 7; ++row) {
+			for (std::size_t col = 0; col < 7; ++col) {
+				if (defaultBoard[row][col] == 1) {
+					m_board[index].setState(FieldState::Occupied);
+				} else if (defaultBoard[row][col] == 0) {
+					m_board[index].setState(FieldState::Empty);
+				}
+				m_board[index].setPosition(std::make_pair(row, col));
+				++index;
+			}
+		}
+	}
+
+	const std::array<Field, 33>& getBoard() const {
+		return m_board;
+	}
+
+	bool isValidMove() {
+
+	}
+
+	void makeMove() {
+
+	}
+
+	bool movesAvailable() {
+
+	}
+
+	bool solutionFound() {
+
+	}
+};
 
 class UserInterface {
 private:
 	sf::RenderWindow& m_window;
-	std::array<Peg, 33> m_board{};
+	GameLogic m_gameLogic{};
 
 public:
 	UserInterface(sf::RenderWindow& window) : m_window{ window } {
@@ -227,7 +294,7 @@ public:
 
 
 
-	void startGame() {
+	void gameLoop() {
 		while (true) {
 
 		}
