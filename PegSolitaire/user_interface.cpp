@@ -201,12 +201,12 @@ public:
 
 class UserInterface {
 private:
-	sf::RenderWindow& m_window;
+	sf::RenderWindow m_window{ sf::VideoMode({ 800, 800 }), "Peg Solitaire" };
 	GameLogic m_gameLogic{};
 	std::map<Field*, sf::CircleShape> fieldToShape{};
 
 public:
-	UserInterface(sf::RenderWindow& window) : m_window{ window } {
+	UserInterface(GameLogic gameLogic) : m_gameLogic{ gameLogic } {
 		// Initialize the user interface
 		// Set positions for the circles based on a peg solitaire board layout
 		for (Field& peg : m_gameLogic.getBoard()) {
@@ -286,6 +286,7 @@ public:
 
 
 	void gameLoop() {
+		drawBoard(); // Draw the initial board
 		GameState gameState = GameState::Playing;
 
 		while (m_window.isOpen())
@@ -364,10 +365,7 @@ public:
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode({ 800, 800 }), "Peg Solitaire");
-	window.clear();
-	UserInterface ui(window);
-	ui.drawBoard(); // draw default board initally
+	GameLogic gameLogic{}; // Initialize the game logic
+	UserInterface ui(gameLogic);
 	ui.gameLoop();
-	
 }
