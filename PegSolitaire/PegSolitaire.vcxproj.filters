@@ -15,11 +15,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Solver.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="GameLogic.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Field.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="user_interface.cpp">
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Field.h">
       <Filter>Quelldateien</Filter>
-    </ClCompile>
+    </ClInclude>
+    <ClInclude Include="GameLogic.h">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterface.h">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
