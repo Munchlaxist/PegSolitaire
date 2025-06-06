@@ -14,7 +14,7 @@ enum class GameState {
 
 class UserInterface {
 private:
-	sf::RenderWindow m_window{ sf::VideoMode({ 800, 800 }), "Peg Solitaire" };
+	sf::RenderWindow m_window{ sf::VideoMode({ 800, 800 }), "Peg Solitaire", sf::Style::Titlebar | sf::Style::Close };
 	GameLogic m_gameLogic{};
 	std::map<Field*, sf::CircleShape> fieldToShape{};
 

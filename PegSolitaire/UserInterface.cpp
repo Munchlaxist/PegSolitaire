@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include "UserInterface.h"
 
@@ -99,6 +100,9 @@ void UserInterface::createTryAgainButton() {
 }
 
 void UserInterface::gameLoop() {
+	sf::Music gameWon("game_won.mp3");
+	sf::Music gameLost("game_lost.mp3");
+	sf::Music correctMove("correct_move.mp3");
 	drawBoard(); // Draw the initial board
 	GameState gameState = GameState::Playing;
 
@@ -126,9 +130,11 @@ void UserInterface::gameLoop() {
 								if (peg->getState() == FieldState::Empty) {
 									// check if the move is valid
 									if (m_gameLogic.isValidMove(*selectedPeg, *peg)) {
+										
 										m_gameLogic.makeMove(*selectedPeg, *peg);
 										updateBoard(); // update the board based on the move, i.e. the map of pegs to circles
 										if (m_gameLogic.solutionFound()) {
+											gameWon.play(); // Play game won sound
 											std::cout << "Solution found! Congratulations!" << std::endl;
 											// todo show solution found message on screen
 											gameState = GameState::GameOver;
@@ -137,6 +143,7 @@ void UserInterface::gameLoop() {
 											break;
 										}
 										if (!m_gameLogic.movesAvailable()) {
+											gameLost.play(); // Play game lost sound
 											std::cout << "No moves available! Game over!" << std::endl;
 											// todo show no moves available message on screen
 											gameState = GameState::GameOver;
@@ -144,6 +151,7 @@ void UserInterface::gameLoop() {
 											createTryAgainButton(); // Draw the try again button
 											break;
 										}
+										correctMove.play(); // Play correct move sound
 									}
 									else {
 										selectedPeg->setState(FieldState::Occupied);
