@@ -103,6 +103,17 @@ void UserInterface::gameLoop() {
 	sf::Music gameWon("game_won.mp3");
 	sf::Music gameLost("game_lost.mp3");
 	sf::Music correctMove("correct_move.mp3");
+
+	sf::Font font;
+	font.openFromFile("arial.ttf");
+	sf::Text gameWonText(font, "Congratulations!", 50);
+	gameWonText.setFillColor(sf::Color::Blue); // Set text color
+	gameWonText.setPosition(sf::Vector2f(200.f, 20.f)); // Set text position
+	sf::Text gameLostText(font, "You lost, try again!", 50);
+	gameLostText.setFillColor(sf::Color::Red); // Set text color
+	gameLostText.setPosition(sf::Vector2f(200.f, 20.f)); // Set text position
+	
+
 	drawBoard(); // Draw the initial board
 	GameState gameState = GameState::Playing;
 
@@ -136,18 +147,22 @@ void UserInterface::gameLoop() {
 										if (m_gameLogic.solutionFound()) {
 											gameWon.play(); // Play game won sound
 											std::cout << "Solution found! Congratulations!" << std::endl;
+											
 											// todo show solution found message on screen
 											gameState = GameState::GameOver;
 											updateBoard(); // update the board based on the move, i.e. the map of pegs to circles
+											m_window.draw(gameWonText); // Draw the game won text
 											createTryAgainButton(); // Draw the try again button
 											break;
 										}
 										if (!m_gameLogic.movesAvailable()) {
 											gameLost.play(); // Play game lost sound
 											std::cout << "No moves available! Game over!" << std::endl;
+											
 											// todo show no moves available message on screen
 											gameState = GameState::GameOver;
 											updateBoard(); // update the board based on the move, i.e. the map of pegs to circles
+											m_window.draw(gameLostText); // Draw the game lost text
 											createTryAgainButton(); // Draw the try again button
 											break;
 										}
