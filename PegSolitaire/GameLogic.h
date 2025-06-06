@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 #include <utility>
-#include "Field.h";
+#include "Field.h"
 
 
 
@@ -33,4 +33,6 @@ public:
 	bool movesAvailable();
 
 	bool solutionFound();
+
+	void resetGame();
 };

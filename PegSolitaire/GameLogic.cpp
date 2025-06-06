@@ -1,7 +1,7 @@
 #include <utility>
 #include <array>
-#include "Field.h";
-#include "GameLogic.h";
+#include "Field.h"
+#include "GameLogic.h"
 
 
 GameLogic::GameLogic() {
@@ -146,4 +146,24 @@ bool GameLogic::solutionFound() {
 		}
 	}
 	return true;
+}
+
+void GameLogic::resetGame() {
+	// Reset the game to the initial state
+	std::size_t index = 0;
+	for (std::size_t row = 0; row < 7; ++row) {
+		for (std::size_t col = 0; col < 7; ++col) {
+			if (defaultBoard[row][col] == 1) {
+				m_board[index].setState(FieldState::Occupied);
+			}
+			else if (defaultBoard[row][col] == 0) {
+				m_board[index].setState(FieldState::Empty);
+			}
+			else {
+				continue; // skip unused fields
+			}
+			m_board[index].setPosition(std::make_pair(row, col));
+			++index;
+		}
+	}
 }
