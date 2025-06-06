@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "UserInterface.h";
+#include "UserInterface.h"
 
 
 UserInterface::UserInterface(GameLogic gameLogic) : m_gameLogic{ gameLogic } {
@@ -81,6 +81,22 @@ Field* UserInterface::getSelectedPeg() {
 	return nullptr;
 }
 
+void UserInterface::createTryAgainButton() {
+	sf::RectangleShape tryAgainButton(sf::Vector2f(150.f, 50.f)); // Create a button with size 200x50 pixels
+	tryAgainButton.setFillColor(sf::Color::Color(47, 126, 244)); // Set button color
+	tryAgainButton.setOutlineColor(sf::Color::Black); // Set button outline color
+	tryAgainButton.setOutlineThickness(2.f); // Set button outline thickness
+	tryAgainButton.setPosition(sf::Vector2f(10.f, 10.f)); // Set button position
+	sf::Font font{};
+	if (font.openFromFile("arial.ttf")) {
+		sf::Text buttonText(font, "Try Again!", 30);
+		buttonText.setFillColor(sf::Color::White); // Set text color
+		buttonText.setPosition(sf::Vector2f(tryAgainButton.getPosition().x + 10.f, tryAgainButton.getPosition().y + 8.f)); // Set text position
+		m_window.draw(tryAgainButton);
+		m_window.draw(buttonText);
+		m_window.display();
+	}
+}
 
 void UserInterface::gameLoop() {
 	drawBoard(); // Draw the initial board
@@ -96,7 +112,7 @@ void UserInterface::gameLoop() {
 			}
 
 			if (gameState == GameState::Playing) {
-
+				
 				if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
 					if (buttonPressed->button == sf::Mouse::Button::Left) {
 						// Handle mouse button pressed events here
@@ -116,12 +132,16 @@ void UserInterface::gameLoop() {
 											std::cout << "Solution found! Congratulations!" << std::endl;
 											// todo show solution found message on screen
 											gameState = GameState::GameOver;
+											updateBoard(); // update the board based on the move, i.e. the map of pegs to circles
+											createTryAgainButton(); // Draw the try again button
 											break;
 										}
 										if (!m_gameLogic.movesAvailable()) {
 											std::cout << "No moves available! Game over!" << std::endl;
 											// todo show no moves available message on screen
 											gameState = GameState::GameOver;
+											updateBoard(); // update the board based on the move, i.e. the map of pegs to circles
+											createTryAgainButton(); // Draw the try again button
 											break;
 										}
 									}
@@ -150,6 +170,21 @@ void UserInterface::gameLoop() {
 
 					// todo try again button with mouse click event
 				}
+			}
+			else {
+				if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+					if (buttonPressed->button == sf::Mouse::Button::Left) {
+						// Handle mouse button pressed events here
+						sf::Vector2i mousePosition = sf::Mouse::getPosition(m_window);
+						if (mousePosition.x >= 10 && mousePosition.x <= 160 && mousePosition.y >= 10 && mousePosition.y <= 60) {
+							// Try again button clicked
+							m_gameLogic.resetGame(); // Reset the game logic
+							updateBoard(); // Update the board to reflect the reset state
+							gameState = GameState::Playing; // Change game state back to playing
+						}
+					}
+				}
+
 			}
 
 

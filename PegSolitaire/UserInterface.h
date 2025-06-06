@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <map>
-#include "Field.h";
+#include "Field.h"
 #include "GameLogic.h"
 
 enum class GameState {
@@ -31,6 +31,8 @@ public:
 	Field* getClickedPeg(const sf::Vector2i& mousePosition);
 
 	Field* getSelectedPeg();
+
+	void createTryAgainButton();
 
 
 	void gameLoop();
