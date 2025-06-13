@@ -2,18 +2,20 @@
 #include <utility>
 
 
-Field::Field(FieldState state = FieldState::Empty, std::pair<int, int> position = { 0,0 }) : m_state{ state }, m_position{ position } {}
+Field::Field(FieldState state, std::pair<int, int> position) : m_state{ state }, m_position{ position } {}
 
-const FieldState& Field::getState() {
+const FieldState& Field::getState() const {
 	return m_state;
 }
+
 const std::pair<int, int> Field::getPosition() const {
 	return m_position;
 }
-void Field::setState(FieldState state) {
+
+void Field::setState(const FieldState& state) {
 	m_state = state;
 }
 
-void Field::setPosition(std::pair<int, int> position) {
+void Field::setPosition(const std::pair<int, int>& position) {
 	m_position = position;
 }
