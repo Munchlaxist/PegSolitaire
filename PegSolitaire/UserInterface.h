@@ -11,29 +11,58 @@ enum class GameState {
 };
 
 
-
+/**
+	Specifies the user interface for the Peg Solitaire game (Prototype!).
+*/
 class UserInterface {
 private:
-	sf::RenderWindow m_window{ sf::VideoMode({ 800, 800 }), "Peg Solitaire", sf::Style::Titlebar | sf::Style::Close };
-	GameLogic m_gameLogic{};
-	std::map<Field*, sf::CircleShape> fieldToShape{};
+	sf::RenderWindow m_window{ sf::VideoMode({ 800, 800 }), "Peg Solitaire", sf::Style::Titlebar | sf::Style::Close }; // The main window for the game
+	GameLogic m_gameLogic{}; // The game logic instance that manages the game state and rules
+	std::map<Field*, sf::CircleShape> fieldToShape{}; // Maps the game fields to their corresponding graphical shapes
 
 public:
+	/**
+		Constructor for the UserInterface class.
+		\param gameLogic The GameLogic instance that manages the game state and logic
+	*/
 	UserInterface(GameLogic gameLogic);
 
-
+	/**
+		Draws the background of the game window.
+		\param filename The relative path to the background image file
+	*/
 	void setBackground(std::filesystem::path filename);
 
+	/**
+		Displays the current state of the game board.
+	*/
 	void drawBoard();
 
-	void updateBoard();
+	/**
+		Synchronizes the state of the game board within the UI based on the previous executed move by the game logic.
+	*/
+	void syncBoard();
 
-	Field* getClickedPeg(const sf::Vector2i& mousePosition);
+	/**
+		Get the field that was clicked based on the mouse position.
+		\param mousePosition The position of the mouse when the click occurred
+		\return Pointer to the Field that was clicked, or nullptr if no field was clicked
+	*/
+	Field* getClickedField(const sf::Vector2i& mousePosition);
 
-	Field* getSelectedPeg();
+	/**
+		Get the currently selected field whose peg should make a move next (if one exists).
+		\return Pointer to the currently selected Field, or nullptr if no Field is selected
+	*/
+	Field* getCurrentSelectedField();
 
+	/**
+		Create and draw a try again button on the game window.
+	*/
 	void createTryAgainButton();
 
-
+	/**
+		Implements the game loop that handles events, updates the game state, and renders the UI.
+	*/
 	void gameLoop();
 };
