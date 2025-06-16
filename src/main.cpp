@@ -46,14 +46,14 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui) {
 					if (buttonPressed->button == sf::Mouse::Button::Left) {
 						// Handle left mouse button pressed events here
 						sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-						if (auto* peg = ui.getClickedField(mousePosition)) {
+						if (auto* field = ui.getClickedField(mousePosition)) {
 							std::cout << "Mouse button pressed at: " << mousePosition.x << ", " << mousePosition.y << std::endl; // Debugging output
 
 							// Check if there already is a field selected -> if so, check if the move is valid, if not mark current field as selected (if it is occupied)
-							if (auto* selectedPeg = ui.getCurrentSelectedField()) {
-								if (peg->getState() == FieldState::Empty) {
-									if (gameLogic.isValidMove(*selectedPeg, *peg)) {
-										gameLogic.makeMove(*selectedPeg, *peg);
+							if (auto* selectedField = ui.getCurrentSelectedField()) {
+								if (field->getState() == FieldState::Empty) {
+									if (gameLogic.isValidMove(*selectedField, *field)) {
+										gameLogic.makeMove(*selectedField, *field);
 										ui.syncBoard(); // Update the board based on the move, i.e. the map of fields to their corresponding circles
 										ui.drawBoard();
 										if (gameLogic.solutionFound()) {
@@ -79,20 +79,20 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui) {
 										correctMove.play(); // Play correct move sound (if the game was not won or lost)
 									}
 									else {
-										selectedPeg->setState(FieldState::Occupied);
+										selectedField->setState(FieldState::Occupied);
 										ui.syncBoard();
 										ui.drawBoard();
 									}
 								}
 								else {
-									selectedPeg->setState(FieldState::Occupied);
+									selectedField->setState(FieldState::Occupied);
 									ui.syncBoard();
 									ui.drawBoard();
 								}
 							}
 							else {
-								if (peg->getState() == FieldState::Occupied) {
-									peg->setState(FieldState::Selected);
+								if (field->getState() == FieldState::Occupied) {
+									field->setState(FieldState::Selected);
 									ui.syncBoard();
 									ui.drawBoard();
 								}

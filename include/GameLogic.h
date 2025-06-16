@@ -40,19 +40,19 @@ public:
 	Field& getField(std::pair<int, int> position);
 
 	/**
-		Checks if a move from selectedPeg to peg is valid.
-		\param selectedPeg The field from which the move is attempted (the selected field)
-		\param peg The field to which the move is attempted (the target field)
+		Checks if a move from selectedField to field is valid.
+		\param selectedField The field from which the move is attempted (the selected field)
+		\param field The field to which the move is attempted (the target field)
 		\return True if the move is valid, false otherwise
 	*/
-	bool isValidMove(Field& selectedPeg, Field& peg); 
+	bool isValidMove(Field& selectedField, Field& field); 
 
 	/**
-		Makes a move from selectedPeg to peg and updates the board accordingly.
-		\param selectedPeg The field from which the move is made (the selected field)
-		\param peg The field to which the move is made (the target field)
+		Makes a move from selectedField to field and updates the board accordingly.
+		\param selectedField The field from which the move is made (the selected field)
+		\param field The field to which the move is made (the target field)
 	*/
-	void makeMove(Field& selectedPeg, Field& peg); 
+	void makeMove(Field& selectedField, Field& field); 
 
 
 	/**

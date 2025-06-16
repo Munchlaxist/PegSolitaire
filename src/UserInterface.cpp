@@ -7,21 +7,21 @@
 
 UserInterface::UserInterface(GameLogic& gameLogic) : m_gameLogic{ gameLogic } {
 	// Initialize the user interface and the board
-	for (Field& peg : m_gameLogic.getBoard()) {
+	for (Field& field : m_gameLogic.getBoard()) {
 		sf::CircleShape circle(20.f); // Every game field is represented by a circle with radius 20 pixels
-		if (peg.getState() == FieldState::Occupied) {
+		if (field.getState() == FieldState::Occupied) {
 			circle.setFillColor(sf::Color::Blue);
 			circle.setOutlineColor(sf::Color::Black);
 			circle.setOutlineThickness(1.f);
-			circle.setPosition(sf::Vector2f(static_cast<float>(225 + peg.getPosition().second * 50), static_cast<float>(225 + peg.getPosition().first * 50))); // Adjust position based on the specific field
-			fieldToShape[&peg] = circle; // Map the field to its circle representation
+			circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50))); // Adjust position based on the specific field
+			fieldToShape[&field] = circle; // Map the field to its circle representation
 		}
-		else if (peg.getState() == FieldState::Empty) {
+		else if (field.getState() == FieldState::Empty) {
 			circle.setFillColor(sf::Color::Transparent);
 			circle.setOutlineColor(sf::Color::Black);
 			circle.setOutlineThickness(1.f);
-			circle.setPosition(sf::Vector2f(static_cast<float>(225 + peg.getPosition().second * 50), static_cast<float>(225 + peg.getPosition().first * 50)));
-			fieldToShape[&peg] = circle;
+			circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50)));
+			fieldToShape[&field] = circle;
 		}
 	}
 }
@@ -47,32 +47,32 @@ void UserInterface::setBackground(std::filesystem::path filename) {
 void UserInterface::drawBoard() {
 	m_window.clear(); // Clear the window before redrawing the new state of the board
 	setBackground("assets/images/white_oak_bg.png");
-	for (auto& peg : m_gameLogic.getBoard()) {
-		m_window.draw(fieldToShape[&peg]);
+	for (auto& field : m_gameLogic.getBoard()) {
+		m_window.draw(fieldToShape[&field]);
 	}
 	m_window.display();
 }
 
 
 void UserInterface::syncBoard() {
-	for (auto& peg : m_gameLogic.getBoard()) {
-		if (peg.getState() == FieldState::Occupied) {
-			fieldToShape[&peg].setFillColor(sf::Color::Blue); // Change color to indicate occupied field
+	for (auto& field : m_gameLogic.getBoard()) {
+		if (field.getState() == FieldState::Occupied) {
+			fieldToShape[&field].setFillColor(sf::Color::Blue); // Change color to indicate occupied field
 		}
-		else if (peg.getState() == FieldState::Empty) {
-			fieldToShape[&peg].setFillColor(sf::Color::Transparent); // Change color to indicate empty field
+		else if (field.getState() == FieldState::Empty) {
+			fieldToShape[&field].setFillColor(sf::Color::Transparent); // Change color to indicate empty field
 		}
-		else if (peg.getState() == FieldState::Selected) {
-			fieldToShape[&peg].setFillColor(sf::Color::Red); // Change color to indicate selected field
+		else if (field.getState() == FieldState::Selected) {
+			fieldToShape[&field].setFillColor(sf::Color::Red); // Change color to indicate selected field
 		}
 	}
 }
 
 
 Field* UserInterface::getClickedField(const sf::Vector2i& mousePosition) {
-	for (auto& peg : m_gameLogic.getBoard()) {
-		if (fieldToShape[&peg].getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosition))) {
-			return &peg; // Return reference to the clicked field
+	for (auto& field : m_gameLogic.getBoard()) {
+		if (fieldToShape[&field].getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosition))) {
+			return &field; // Return reference to the clicked field
 		}
 	}
 	return nullptr;
@@ -80,9 +80,9 @@ Field* UserInterface::getClickedField(const sf::Vector2i& mousePosition) {
 
 
 Field* UserInterface::getCurrentSelectedField() {
-	for (auto& peg : m_gameLogic.getBoard()) {
-		if (peg.getState() == FieldState::Selected) {
-			return &peg; // Return reference to the selected field
+	for (auto& field : m_gameLogic.getBoard()) {
+		if (field.getState() == FieldState::Selected) {
+			return &field; // Return reference to the selected field
 		}
 	}
 	return nullptr;

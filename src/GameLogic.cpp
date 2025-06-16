@@ -40,40 +40,40 @@ Field& GameLogic::getField(std::pair<int, int> position) {
 	throw std::runtime_error("Field not found at the given position (" + position.first + ',' + position.second + ')');
 }
 
-bool GameLogic::isValidMove(Field& selectedPeg, Field& peg) {
-	std::pair<int, int> selectedPegPosition = selectedPeg.getPosition();
-	std::pair<int, int> nextPegPosition = peg.getPosition();
+bool GameLogic::isValidMove(Field& selectedField, Field& field) {
+	std::pair<int, int> selectedFieldPosition = selectedField.getPosition();
+	std::pair<int, int> nextFieldPosition = field.getPosition();
 
 	// Check which direction the move is going and check if the move is valid
-	if (std::get<0>(selectedPegPosition) - 2 == std::get<0>(nextPegPosition) && std::get<1>(selectedPegPosition) == std::get<1>(nextPegPosition)) {
+	if (std::get<0>(selectedFieldPosition) - 2 == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) == std::get<1>(nextFieldPosition)) {
 		// Then we jump up; check if there is an occupied field in between. If so the move is valid
-		Field& jumpedOverPeg = getField(std::make_pair(std::get<0>(selectedPegPosition) - 1, std::get<1>(selectedPegPosition)));
-		if (jumpedOverPeg.getState() == FieldState::Occupied && peg.getState() == FieldState::Empty) {
+		Field& jumpedOverField = getField(std::make_pair(std::get<0>(selectedFieldPosition) - 1, std::get<1>(selectedFieldPosition)));
+		if (jumpedOverField.getState() == FieldState::Occupied && field.getState() == FieldState::Empty) {
 			return true;
 
 		}
 	}
-	else if (std::get<0>(selectedPegPosition) + 2 == std::get<0>(nextPegPosition) && std::get<1>(selectedPegPosition) == std::get<1>(nextPegPosition)) {
+	else if (std::get<0>(selectedFieldPosition) + 2 == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) == std::get<1>(nextFieldPosition)) {
 		// Then we jump down; check if there is an occupied field in between. If so the move is valid
-		Field& jumpedOverPeg = getField(std::make_pair(std::get<0>(selectedPegPosition) + 1, std::get<1>(selectedPegPosition)));
-		if (jumpedOverPeg.getState() == FieldState::Occupied && peg.getState() == FieldState::Empty) {
+		Field& jumpedOverField = getField(std::make_pair(std::get<0>(selectedFieldPosition) + 1, std::get<1>(selectedFieldPosition)));
+		if (jumpedOverField.getState() == FieldState::Occupied && field.getState() == FieldState::Empty) {
 			return true;
 
 
 		}
 	}
-	else if (std::get<0>(selectedPegPosition) == std::get<0>(nextPegPosition) && std::get<1>(selectedPegPosition) - 2 == std::get<1>(nextPegPosition)) {
+	else if (std::get<0>(selectedFieldPosition) == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) - 2 == std::get<1>(nextFieldPosition)) {
 		// Then we jump to the left; check if there is an occupied field in between. If so the move is valid
-		Field& jumpedOverPeg = getField(std::make_pair(std::get<0>(selectedPegPosition), std::get<1>(selectedPegPosition) - 1));
-		if (jumpedOverPeg.getState() == FieldState::Occupied && peg.getState() == FieldState::Empty) {
+		Field& jumpedOverField = getField(std::make_pair(std::get<0>(selectedFieldPosition), std::get<1>(selectedFieldPosition) - 1));
+		if (jumpedOverField.getState() == FieldState::Occupied && field.getState() == FieldState::Empty) {
 			return true;
 
 		}
 	}
-	else if (std::get<0>(selectedPegPosition) == std::get<0>(nextPegPosition) && std::get<1>(selectedPegPosition) + 2 == std::get<1>(nextPegPosition)) {
+	else if (std::get<0>(selectedFieldPosition) == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) + 2 == std::get<1>(nextFieldPosition)) {
 		// Then we jump to the right; check if there is an occupied field in between. If so the move is valid
-		Field& jumpedOverPeg = getField(std::make_pair(std::get<0>(selectedPegPosition), std::get<1>(selectedPegPosition) + 1));
-		if (jumpedOverPeg.getState() == FieldState::Occupied && peg.getState() == FieldState::Empty) {
+		Field& jumpedOverField = getField(std::make_pair(std::get<0>(selectedFieldPosition), std::get<1>(selectedFieldPosition) + 1));
+		if (jumpedOverField.getState() == FieldState::Occupied && field.getState() == FieldState::Empty) {
 			return true;
 
 		}
@@ -81,46 +81,46 @@ bool GameLogic::isValidMove(Field& selectedPeg, Field& peg) {
 	return false;
 }
 
-void GameLogic::makeMove(Field& selectedPeg, Field& peg) {
-	std::pair<int, int> selectedPegPosition = selectedPeg.getPosition();
-	std::pair<int, int> nextPegPosition = peg.getPosition();
+void GameLogic::makeMove(Field& selectedField, Field& field) {
+	std::pair<int, int> selectedFieldPosition = selectedField.getPosition();
+	std::pair<int, int> nextFieldPosition = field.getPosition();
 
-	if (std::get<0>(selectedPegPosition) - 2 == std::get<0>(nextPegPosition) && std::get<1>(selectedPegPosition) == std::get<1>(nextPegPosition)) {
+	if (std::get<0>(selectedFieldPosition) - 2 == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) == std::get<1>(nextFieldPosition)) {
 		// Then we jump up - set the new states of the fields accordingly
-		Field& jumpedOverPeg = getField(std::make_pair(std::get<0>(selectedPegPosition) - 1, std::get<1>(selectedPegPosition)));
-		selectedPeg.setState(FieldState::Empty);
-		peg.setState(FieldState::Occupied);
-		jumpedOverPeg.setState(FieldState::Empty);
+		Field& jumpedOverField = getField(std::make_pair(std::get<0>(selectedFieldPosition) - 1, std::get<1>(selectedFieldPosition)));
+		selectedField.setState(FieldState::Empty);
+		field.setState(FieldState::Occupied);
+		jumpedOverField.setState(FieldState::Empty);
 	}
-	else if (std::get<0>(selectedPegPosition) + 2 == std::get<0>(nextPegPosition) && std::get<1>(selectedPegPosition) == std::get<1>(nextPegPosition)) {
+	else if (std::get<0>(selectedFieldPosition) + 2 == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) == std::get<1>(nextFieldPosition)) {
 		// Then we jump down - set the new states of the fields accordingly
-		Field& jumpedOverPeg = getField(std::make_pair(std::get<0>(selectedPegPosition) + 1, std::get<1>(selectedPegPosition)));
-		selectedPeg.setState(FieldState::Empty);
-		peg.setState(FieldState::Occupied);
-		jumpedOverPeg.setState(FieldState::Empty);
+		Field& jumpedOverField = getField(std::make_pair(std::get<0>(selectedFieldPosition) + 1, std::get<1>(selectedFieldPosition)));
+		selectedField.setState(FieldState::Empty);
+		field.setState(FieldState::Occupied);
+		jumpedOverField.setState(FieldState::Empty);
 	}
-	else if (std::get<0>(selectedPegPosition) == std::get<0>(nextPegPosition) && std::get<1>(selectedPegPosition) - 2 == std::get<1>(nextPegPosition)) {
+	else if (std::get<0>(selectedFieldPosition) == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) - 2 == std::get<1>(nextFieldPosition)) {
 		// Then we jump to the left - set the new states of the fields accordingly
-		Field& jumpedOverPeg = getField(std::make_pair(std::get<0>(selectedPegPosition), std::get<1>(selectedPegPosition) - 1));
-		selectedPeg.setState(FieldState::Empty);
-		peg.setState(FieldState::Occupied);
-		jumpedOverPeg.setState(FieldState::Empty);
+		Field& jumpedOverField = getField(std::make_pair(std::get<0>(selectedFieldPosition), std::get<1>(selectedFieldPosition) - 1));
+		selectedField.setState(FieldState::Empty);
+		field.setState(FieldState::Occupied);
+		jumpedOverField.setState(FieldState::Empty);
 	}
-	else if (std::get<0>(selectedPegPosition) == std::get<0>(nextPegPosition) && std::get<1>(selectedPegPosition) + 2 == std::get<1>(nextPegPosition)) {
+	else if (std::get<0>(selectedFieldPosition) == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) + 2 == std::get<1>(nextFieldPosition)) {
 		// Then we jump to the right - set the new states of the fields accordingly
-		Field& jumpedOverPeg = getField(std::make_pair(std::get<0>(selectedPegPosition), std::get<1>(selectedPegPosition) + 1));
-		selectedPeg.setState(FieldState::Empty);
-		peg.setState(FieldState::Occupied);
-		jumpedOverPeg.setState(FieldState::Empty);
+		Field& jumpedOverField = getField(std::make_pair(std::get<0>(selectedFieldPosition), std::get<1>(selectedFieldPosition) + 1));
+		selectedField.setState(FieldState::Empty);
+		field.setState(FieldState::Occupied);
+		jumpedOverField.setState(FieldState::Empty);
 	}
 }
 
 bool GameLogic::movesAvailable() {
-	for (Field& selectedPeg : m_board) {
-		if (selectedPeg.getState() == FieldState::Occupied) {
-			for (Field& peg : m_board) {
-				if (peg.getState() == FieldState::Empty) {
-					if (isValidMove(selectedPeg, peg)) {
+	for (Field& selectedField : m_board) {
+		if (selectedField.getState() == FieldState::Occupied) {
+			for (Field& field : m_board) {
+				if (field.getState() == FieldState::Empty) {
+					if (isValidMove(selectedField, field)) {
 						return true;
 					}
 				}
@@ -131,9 +131,9 @@ bool GameLogic::movesAvailable() {
 }
 
 bool GameLogic::solutionFound() {
-	for (Field& peg : m_board) {
-		if (peg.getState() == FieldState::Occupied && peg.getPosition() != std::pair<int, int>(3, 3)) {
-			return false; // If any peg is still occupied besides the one in the center, the solution is not found
+	for (Field& field : m_board) {
+		if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(3, 3)) {
+			return false; // If any field is still occupied besides the one in the center, the solution is not found
 		}
 	}
 	return true;
