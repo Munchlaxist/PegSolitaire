@@ -16,8 +16,8 @@ enum class GameState {
 */
 class UserInterface {
 private:
+	GameLogic& m_gameLogic; // The game logic instance that manages the game state and rules
 	sf::RenderWindow m_window{ sf::VideoMode({ 800, 800 }), "Peg Solitaire", sf::Style::Titlebar | sf::Style::Close }; // The main window for the game
-	GameLogic m_gameLogic{}; // The game logic instance that manages the game state and rules
 	std::map<Field*, sf::CircleShape> fieldToShape{}; // Maps the game fields to their corresponding graphical shapes
 
 public:
@@ -26,6 +26,12 @@ public:
 		\param gameLogic The GameLogic instance that manages the game state and logic
 	*/
 	UserInterface(GameLogic& gameLogic);
+
+	/**
+		Gets the render window used for drawing the game UI.
+		\return Reference to the RenderWindow used for rendering the game UI
+	*/
+	sf::RenderWindow& getRenderWindow();
 
 	/**
 		Draws the background of the game window.
@@ -60,9 +66,4 @@ public:
 		Create and draw a try again button on the game window.
 	*/
 	void createTryAgainButton();
-
-	/**
-		Implements the game loop that handles events, updates the game state, and renders the UI.
-	*/
-	void gameLoop();
 };
