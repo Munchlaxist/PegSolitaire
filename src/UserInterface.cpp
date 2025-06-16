@@ -46,7 +46,7 @@ void UserInterface::setBackground(std::filesystem::path filename) {
 
 void UserInterface::drawBoard() {
 	m_window.clear(); // Clear the window before redrawing the new state of the board
-	setBackground("white_oak_bg.png");
+	setBackground("assets/images/white_oak_bg.png");
 	for (auto& peg : m_gameLogic.getBoard()) {
 		m_window.draw(fieldToShape[&peg]);
 	}
@@ -96,7 +96,7 @@ void UserInterface::createTryAgainButton() {
 	tryAgainButton.setOutlineThickness(2.f);
 	tryAgainButton.setPosition(sf::Vector2f(10.f, 10.f));
 	sf::Font font{}; // load a font for the button text
-	if (font.openFromFile("arial.ttf")) {
+	if (font.openFromFile("assets/fonts/arial.ttf")) {
 		sf::Text buttonText(font, "Try Again!", 30);
 		buttonText.setFillColor(sf::Color::White);
 		buttonText.setPosition(sf::Vector2f(tryAgainButton.getPosition().x + 10.f, tryAgainButton.getPosition().y + 8.f));
