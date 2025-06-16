@@ -61,7 +61,6 @@ void UserInterface::syncBoard() {
 			fieldToShape[&peg].setFillColor(sf::Color::Red); // Change color to indicate selected field
 		}
 	}
-	drawBoard(); // Redraw the board with updated peg states
 }
 
 
@@ -149,11 +148,13 @@ void UserInterface::gameLoop() {
 									if (m_gameLogic.isValidMove(*selectedPeg, *peg)) {
 										m_gameLogic.makeMove(*selectedPeg, *peg);
 										syncBoard(); // Update the board based on the move, i.e. the map of fields to their corresponding circles
+										drawBoard();
 										if (m_gameLogic.solutionFound()) {
 											gameWon.play(); // Play game won sound
 											std::cout << "Solution found! Congratulations!" << std::endl;
 											gameState = GameState::GameOver; // TODO actually you won, that needs to be adapted later on
 											syncBoard();
+											drawBoard();
 											m_window.draw(gameWonText); // Draw the game won text
 											createTryAgainButton(); // Draw the try again button
 											break;
@@ -163,6 +164,7 @@ void UserInterface::gameLoop() {
 											std::cout << "No moves available! Game over!" << std::endl;
 											gameState = GameState::GameOver;
 											syncBoard();
+											drawBoard();
 											m_window.draw(gameLostText); // Draw the game lost text
 											createTryAgainButton(); // Draw the try again button
 											break;
@@ -172,17 +174,20 @@ void UserInterface::gameLoop() {
 									else {
 										selectedPeg->setState(FieldState::Occupied);
 										syncBoard();
+										drawBoard();
 									}
 								}
 								else {
 									selectedPeg->setState(FieldState::Occupied);
 									syncBoard();
+									drawBoard();
 								}
 							}
 							else {
 								if (peg->getState() == FieldState::Occupied) {
 									peg->setState(FieldState::Selected);
 									syncBoard();
+									drawBoard();
 								}
 							}
 
@@ -197,6 +202,7 @@ void UserInterface::gameLoop() {
 						if (mousePosition.x >= 10 && mousePosition.x <= 160 && mousePosition.y >= 10 && mousePosition.y <= 60) {
 							m_gameLogic.resetGame(); // Reset the game logic
 							syncBoard(); // Reset the board
+							drawBoard();
 							gameState = GameState::Playing; // Change game state back to playing
 						}
 					}
