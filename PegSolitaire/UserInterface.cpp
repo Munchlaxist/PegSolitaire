@@ -5,7 +5,7 @@
 #include "UserInterface.h"
 
 
-UserInterface::UserInterface(GameLogic gameLogic) : m_gameLogic{ gameLogic } {
+UserInterface::UserInterface(GameLogic& gameLogic) : m_gameLogic{ gameLogic } {
 	// Initialize the user interface and the board
 	for (Field& peg : m_gameLogic.getBoard()) {
 		sf::CircleShape circle(20.f); // Every game field is represented by a circle with radius 20 pixels
@@ -13,14 +13,14 @@ UserInterface::UserInterface(GameLogic gameLogic) : m_gameLogic{ gameLogic } {
 			circle.setFillColor(sf::Color::Blue);
 			circle.setOutlineColor(sf::Color::Black);
 			circle.setOutlineThickness(1.f);
-			circle.setPosition(sf::Vector2f(225 + peg.getPosition().second * 50, 225 + peg.getPosition().first * 50)); // Adjust position based on the specific field
+			circle.setPosition(sf::Vector2f(static_cast<float>(225 + peg.getPosition().second * 50), static_cast<float>(225 + peg.getPosition().first * 50))); // Adjust position based on the specific field
 			fieldToShape[&peg] = circle; // Map the field to its circle representation
 		}
 		else if (peg.getState() == FieldState::Empty) {
 			circle.setFillColor(sf::Color::Transparent);
 			circle.setOutlineColor(sf::Color::Black);
 			circle.setOutlineThickness(1.f);
-			circle.setPosition(sf::Vector2f(225 + peg.getPosition().second * 50, 225 + peg.getPosition().first * 50));
+			circle.setPosition(sf::Vector2f(static_cast<float>(225 + peg.getPosition().second * 50), static_cast<float>(225 + peg.getPosition().first * 50)));
 			fieldToShape[&peg] = circle;
 		}
 	}
