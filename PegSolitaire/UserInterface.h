@@ -25,7 +25,7 @@ public:
 		Constructor for the UserInterface class.
 		\param gameLogic The GameLogic instance that manages the game state and logic
 	*/
-	UserInterface(GameLogic gameLogic);
+	UserInterface(GameLogic& gameLogic);
 
 	/**
 		Draws the background of the game window.
