@@ -15,30 +15,30 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Solver.cpp">
+    <ClCompile Include="src\Field.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="UserInterface.cpp">
+    <ClCompile Include="src\GameLogic.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="GameLogic.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Field.cpp">
+    <ClCompile Include="src\Solver.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\UserInterface.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\Field.h">
+    <ClInclude Include="include\Field.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\GameLogic.h">
+    <ClInclude Include="include\GameLogic.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\UserInterface.h">
+    <ClInclude Include="include\UserInterface.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
