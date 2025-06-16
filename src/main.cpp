@@ -11,13 +11,13 @@
 void gameLoop(GameLogic& gameLogic, UserInterface& ui) {
 	sf::RenderWindow& window = ui.getRenderWindow();
 	// TODO: Implement music input as seperate function
-	sf::Music gameWon("game_won.mp3");
-	sf::Music gameLost("game_lost.mp3");
-	sf::Music correctMove("correct_move.mp3");
+	sf::Music gameWon("assets/sounds/game_won.mp3");
+	sf::Music gameLost("assets/sounds/game_lost.mp3");
+	sf::Music correctMove("assets/sounds/correct_move.mp3");
 
 	// TODO: Implement winning/losing message as seperate function
 	sf::Font font;
-	if (!font.openFromFile("arial.ttf")) {
+	if (!font.openFromFile("assets/fonts/arial.ttf")) {
 		throw std::runtime_error("Could not load font: arial.ttf");
 	}
 	sf::Text gameWonText(font, "Congratulations!", 50);
