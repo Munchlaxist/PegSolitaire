@@ -32,7 +32,7 @@ sf::RenderWindow& UserInterface::getRenderWindow() {
 }
 
 
-void UserInterface::setBackground(std::filesystem::path filename) {
+void UserInterface::drawBackground(std::filesystem::path filename) {
 	m_window.clear();
 	sf::Texture backgroundTexture; // Create texture for the background
 	if (!backgroundTexture.loadFromFile(filename)) {
@@ -45,16 +45,13 @@ void UserInterface::setBackground(std::filesystem::path filename) {
 
 
 void UserInterface::drawBoard() {
-	m_window.clear(); // Clear the window before redrawing the new state of the board
-	setBackground("assets/images/white_oak_bg.png");
 	for (auto& field : m_gameLogic.getBoard()) {
 		m_window.draw(fieldToShape[&field]);
 	}
-	m_window.display();
 }
 
 
-void UserInterface::syncBoard() {
+void UserInterface::updateBoard() {
 	for (auto& field : m_gameLogic.getBoard()) {
 		if (field.getState() == FieldState::Occupied) {
 			fieldToShape[&field].setFillColor(sf::Color::Blue); // Change color to indicate occupied field
@@ -89,7 +86,7 @@ Field* UserInterface::getCurrentSelectedField() {
 }
 
 
-void UserInterface::displayTryAgainButton() {
+void UserInterface::drawTryAgainButton() {
 	sf::RectangleShape tryAgainButton(sf::Vector2f(150.f, 50.f)); // Create a button with size 150x50 pixels
 	tryAgainButton.setFillColor(sf::Color::Color(47, 126, 244)); // RBG color
 	tryAgainButton.setOutlineColor(sf::Color::Black);
@@ -102,11 +99,10 @@ void UserInterface::displayTryAgainButton() {
 		buttonText.setPosition(sf::Vector2f(tryAgainButton.getPosition().x + 10.f, tryAgainButton.getPosition().y + 8.f));
 		m_window.draw(tryAgainButton);
 		m_window.draw(buttonText);
-		m_window.display();
 	}
 }
 
-void UserInterface::displayGameOverText() {
+void UserInterface::drawGameOverText() {
 	sf::Font font;
 	if (!font.openFromFile("assets/fonts/arial.ttf")) {
 		throw std::runtime_error("Could not load font for game over text message.");
@@ -117,7 +113,7 @@ void UserInterface::displayGameOverText() {
 	m_window.draw(gameLostText);
 }
 
-void UserInterface::displayGameWonText() {
+void UserInterface::drawGameWonText() {
 	sf::Font font;
 	if (!font.openFromFile("assets/fonts/arial.ttf")) {
 		throw std::runtime_error("Could not load font for game won text message.");
@@ -126,4 +122,18 @@ void UserInterface::displayGameWonText() {
 	gameWonText.setFillColor(sf::Color::Red); // Set text color
 	gameWonText.setPosition(sf::Vector2f(200.f, 20.f)); // Set text position
 	m_window.draw(gameWonText);
+}
+
+void UserInterface::render() {
+	m_window.clear();
+	drawBackground("assets/images/white_oak_bg.png");
+	drawBoard();
+	if (m_gameLogic.getCurrentGameState() == GameState::GameLost) {
+		drawGameOverText();
+		drawTryAgainButton();
+	} else if (m_gameLogic.getCurrentGameState() == GameState::GameWon) {
+		drawGameWonText();
+		drawTryAgainButton();
+	}
+	m_window.display();
 }
