@@ -89,7 +89,7 @@ Field* UserInterface::getCurrentSelectedField() {
 }
 
 
-void UserInterface::createTryAgainButton() {
+void UserInterface::displayTryAgainButton() {
 	sf::RectangleShape tryAgainButton(sf::Vector2f(150.f, 50.f)); // Create a button with size 150x50 pixels
 	tryAgainButton.setFillColor(sf::Color::Color(47, 126, 244)); // RBG color
 	tryAgainButton.setOutlineColor(sf::Color::Black);
@@ -104,4 +104,26 @@ void UserInterface::createTryAgainButton() {
 		m_window.draw(buttonText);
 		m_window.display();
 	}
+}
+
+void UserInterface::displayGameOverText() {
+	sf::Font font;
+	if (!font.openFromFile("assets/fonts/arial.ttf")) {
+		throw std::runtime_error("Could not load font for game over text message.");
+	}
+	sf::Text gameLostText(font, "You lost, try again!", 50);
+	gameLostText.setFillColor(sf::Color::Red); // Set text color
+	gameLostText.setPosition(sf::Vector2f(200.f, 20.f)); // Set text position
+	m_window.draw(gameLostText);
+}
+
+void UserInterface::displayGameWonText() {
+	sf::Font font;
+	if (!font.openFromFile("assets/fonts/arial.ttf")) {
+		throw std::runtime_error("Could not load font for game won text message.");
+	}
+	sf::Text gameWonText(font, "Congratulations!", 50);
+	gameWonText.setFillColor(sf::Color::Red); // Set text color
+	gameWonText.setPosition(sf::Vector2f(200.f, 20.f)); // Set text position
+	m_window.draw(gameWonText);
 }

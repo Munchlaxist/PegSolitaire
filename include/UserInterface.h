@@ -65,5 +65,16 @@ public:
 	/**
 		Create and draw a try again button on the game window.
 	*/
-	void createTryAgainButton();
+	void displayTryAgainButton();
+
+	/**
+		Create and draw a game over text on the game window.
+	*/
+	void displayGameOverText();
+
+	/**
+		Create and draw a game won text on the game window.
+	*/
+	void displayGameWonText();
+
 };
