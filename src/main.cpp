@@ -11,20 +11,6 @@
 */
 void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManager) {
 	sf::RenderWindow& window = ui.getRenderWindow();
-
-	// TODO: Implement winning/losing message as seperate function
-	sf::Font font;
-	if (!font.openFromFile("assets/fonts/arial.ttf")) {
-		throw std::runtime_error("Could not load font: arial.ttf");
-	}
-	sf::Text gameWonText(font, "Congratulations!", 50);
-	gameWonText.setFillColor(sf::Color::Blue); // Set text color
-	gameWonText.setPosition(sf::Vector2f(200.f, 20.f)); // Set text position
-	sf::Text gameLostText(font, "You lost, try again!", 50);
-	gameLostText.setFillColor(sf::Color::Red); // Set text color
-	gameLostText.setPosition(sf::Vector2f(200.f, 20.f)); // Set text position
-
-
 	ui.drawBoard(); // Draw the initial board
 	GameState gameState = GameState::Playing;
 
@@ -59,8 +45,8 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 											gameState = GameState::GameOver; // TODO actually you won, that needs to be adapted later on
 											ui.syncBoard();
 											ui.drawBoard();
-											window.draw(gameWonText); // Draw the game won text
-											ui.createTryAgainButton(); // Draw the try again button
+											ui.displayGameWonText(); // Draw the game won text
+											ui.displayTryAgainButton(); // Draw the try again button
 											break;
 										}
 										if (!gameLogic.movesAvailable()) {
@@ -69,8 +55,8 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 											gameState = GameState::GameOver;
 											ui.syncBoard();
 											ui.drawBoard();
-											window.draw(gameLostText); // Draw the game lost text
-											ui.createTryAgainButton(); // Draw the try again button
+											ui.displayGameOverText(); // Draw the game lost text
+											ui.displayTryAgainButton(); // Draw the try again button
 											break;
 										}
 										soundManager.playCorrectMoveSound(); // Play correct move sound (if the game was not won or lost)
