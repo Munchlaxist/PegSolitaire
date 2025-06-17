@@ -1,5 +1,6 @@
 #include "GameLogic.h"
 #include "UserInterface.h"
+#include "SoundManager.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -8,12 +9,8 @@
 /**
 	Implements the game loop that handles events, updates the game state, and renders the UI.
 */
-void gameLoop(GameLogic& gameLogic, UserInterface& ui) {
+void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManager) {
 	sf::RenderWindow& window = ui.getRenderWindow();
-	// TODO: Implement music input as seperate function
-	sf::Music gameWon("assets/sounds/game_won.mp3");
-	sf::Music gameLost("assets/sounds/game_lost.mp3");
-	sf::Music correctMove("assets/sounds/correct_move.mp3");
 
 	// TODO: Implement winning/losing message as seperate function
 	sf::Font font;
@@ -57,7 +54,7 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui) {
 										ui.syncBoard(); // Update the board based on the move, i.e. the map of fields to their corresponding circles
 										ui.drawBoard();
 										if (gameLogic.solutionFound()) {
-											gameWon.play(); // Play game won sound
+											soundManager.playGameWonSound(); // Play game won sound
 											std::cout << "Solution found! Congratulations!" << std::endl;
 											gameState = GameState::GameOver; // TODO actually you won, that needs to be adapted later on
 											ui.syncBoard();
@@ -67,7 +64,7 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui) {
 											break;
 										}
 										if (!gameLogic.movesAvailable()) {
-											gameLost.play(); // Play game lost sound
+											soundManager.playGameLostSound(); // Play game lost sound
 											std::cout << "No moves available! Game over!" << std::endl;
 											gameState = GameState::GameOver;
 											ui.syncBoard();
@@ -76,7 +73,7 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui) {
 											ui.createTryAgainButton(); // Draw the try again button
 											break;
 										}
-										correctMove.play(); // Play correct move sound (if the game was not won or lost)
+										soundManager.playCorrectMoveSound(); // Play correct move sound (if the game was not won or lost)
 									}
 									else {
 										selectedField->setState(FieldState::Occupied);
@@ -122,7 +119,8 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui) {
 int main()
 {
 	GameLogic gameLogic{}; // Initialize the game logic
-	UserInterface ui(gameLogic);
+	UserInterface ui(gameLogic); // Initialize the user interface with the game logic
+	SoundManager soundManager; // Initialize the sound manager
 
-	gameLoop(gameLogic, ui); // Start the game loop
+	gameLoop(gameLogic, ui, soundManager); // Start the game loop
 }
