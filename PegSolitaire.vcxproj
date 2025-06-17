@@ -23,11 +23,13 @@
     <ClCompile Include="src\GameLogic.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Solver.cpp" />
+    <ClCompile Include="src\SoundManager.cpp" />
     <ClCompile Include="src\UserInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Field.h" />
     <ClInclude Include="include\GameLogic.h" />
+    <ClInclude Include="include\SoundManager.h" />
     <ClInclude Include="include\UserInterface.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
