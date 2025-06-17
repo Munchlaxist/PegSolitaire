@@ -31,6 +31,14 @@ std::array<Field, 33>& GameLogic::getBoard() {
 	return m_board;
 }
 
+GameState& GameLogic::getCurrentGameState() {
+	return m_gameState;
+}
+
+void GameLogic::setGameState(GameState state) {
+	m_gameState = state;
+}
+
 Field& GameLogic::getField(std::pair<int, int> position) {
 	for (Field& field : m_board) {
 		if (field.getPosition() == position) {

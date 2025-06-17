@@ -3,6 +3,17 @@
 #include <utility>
 #include "Field.h"
 
+/**
+	Describes the possible states of the game.
+	- Playing: The game is ongoing and the player can make moves.
+	- GameWon: The player has successfully completed the game by leaving only one peg in the center position.
+	- GameLost: The player has no valid moves left and is game over.
+*/
+enum class GameState {
+	Playing,
+	GameWon,
+	GameLost,
+};
 
 /**
 	Implementation of the game logic for the Peg Solitaire game.
@@ -10,6 +21,7 @@
 class GameLogic {
 private:
 	std::array<Field, 33> m_board{}; // Represents the board (33 fields in total) with 7x7-grid positions
+	GameState m_gameState{ GameState::Playing }; // Current state of the game
 	static constexpr std::array<std::array<int, 7>, 7> defaultBoard{ {
 	{-1, -1, 1, 1, 1, -1, -1},
 	{-1, -1, 1, 1, 1, -1, -1},
@@ -31,6 +43,18 @@ public:
 		\return A reference to the array representing the board as fields
 	*/
 	std::array<Field, 33>& getBoard();
+
+	/**
+		Gets the current state of the game.
+		\return The current game state (Playing, GameWon, GameLost)
+	*/
+	GameState& getCurrentGameState();
+
+	/**
+		Sets the current state of the game.
+		\param state The new game state to set
+	*/
+	void setGameState(GameState state);
 
 	/**
 		Gets the field at a specific position on the board.
