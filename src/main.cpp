@@ -3,6 +3,7 @@
 #include "SoundManager.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
+#include <SFML/System.hpp>
 #include <iostream>
 
 
@@ -11,13 +12,13 @@
 */
 void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManager) {
 	sf::RenderWindow& window = ui.getRenderWindow();
-	ui.drawBoard(); // Draw the initial board
 
 	while (window.isOpen())
 	{
+		ui.render();
 		while (const std::optional event = window.pollEvent())
 		{
-
+			// event for closing the window
 			if (event->is<sf::Event::Closed>()) {
 				window.close();
 			}
@@ -36,47 +37,35 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 								if (field->getState() == FieldState::Empty) {
 									if (gameLogic.isValidMove(*selectedField, *field)) {
 										gameLogic.makeMove(*selectedField, *field);
-										ui.syncBoard(); // Update the board based on the move, i.e. the map of fields to their corresponding circles
-										ui.drawBoard();
+										ui.updateBoard(); // Update the board based on the move, i.e. the map of fields to their corresponding circles
 										if (gameLogic.solutionFound()) {
 											soundManager.playGameWonSound(); // Play game won sound
 											std::cout << "Solution found! Congratulations!" << std::endl;
 											gameLogic.setGameState(GameState::GameWon);
-											ui.syncBoard();
-											ui.drawBoard();
-											ui.displayGameWonText(); // Draw the game won text
-											ui.displayTryAgainButton(); // Draw the try again button
 											break;
 										}
 										if (!gameLogic.movesAvailable()) {
 											soundManager.playGameLostSound(); // Play game lost sound
 											std::cout << "No moves available! Game over!" << std::endl;
 											gameLogic.setGameState(GameState::GameLost);
-											ui.syncBoard();
-											ui.drawBoard();
-											ui.displayGameOverText(); // Draw the game lost text
-											ui.displayTryAgainButton(); // Draw the try again button
 											break;
 										}
 										soundManager.playCorrectMoveSound(); // Play correct move sound (if the game was not won or lost)
 									}
 									else {
 										selectedField->setState(FieldState::Occupied);
-										ui.syncBoard();
-										ui.drawBoard();
+										ui.updateBoard();
 									}
 								}
 								else {
 									selectedField->setState(FieldState::Occupied);
-									ui.syncBoard();
-									ui.drawBoard();
+									ui.updateBoard();
 								}
 							}
 							else {
 								if (field->getState() == FieldState::Occupied) {
 									field->setState(FieldState::Selected);
-									ui.syncBoard();
-									ui.drawBoard();
+									ui.updateBoard();
 								}
 							}
 
@@ -90,8 +79,7 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 						sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 						if (mousePosition.x >= 10 && mousePosition.x <= 160 && mousePosition.y >= 10 && mousePosition.y <= 60) {
 							gameLogic.resetGame(); // Reset the game logic
-							ui.syncBoard(); // Reset the board
-							ui.drawBoard();
+							ui.updateBoard(); // Reset the board
 							gameLogic.setGameState(GameState::Playing); // Change game state back to playing
 						}
 					}
