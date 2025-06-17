@@ -32,7 +32,7 @@ public:
 		Draws the background of the game window.
 		\param filename The relative path to the background image file
 	*/
-	void setBackground(std::filesystem::path filename);
+	void drawBackground(std::filesystem::path filename);
 
 	/**
 		Displays the current state of the game board.
@@ -40,9 +40,9 @@ public:
 	void drawBoard();
 
 	/**
-		Synchronizes the state of the game board within the UI based on the previous executed move by the game logic.
+		Updates the state of the game board within the UI based on the previous executed move by the game logic.
 	*/
-	void syncBoard();
+	void updateBoard();
 
 	/**
 		Get the field that was clicked based on the mouse position.
@@ -60,16 +60,21 @@ public:
 	/**
 		Create and draw a try again button on the game window.
 	*/
-	void displayTryAgainButton();
+	void drawTryAgainButton();
 
 	/**
 		Create and draw a game over text on the game window.
 	*/
-	void displayGameOverText();
+	void drawGameOverText();
 
 	/**
 		Create and draw a game won text on the game window.
 	*/
-	void displayGameWonText();
+	void drawGameWonText();
+
+	/**
+		Clears, draws and displays the game window for the next frame.
+	*/
+	void render();
 
 };
