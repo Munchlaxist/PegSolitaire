@@ -8,80 +8,67 @@
 
 
 /**
-	Implements the game loop that handles events, updates the game state, and renders the UI.
+	handles events such as mouse clicks and window closing.
 */
-void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManager) {
-	sf::RenderWindow& window = ui.getRenderWindow();
+static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManager) {
+	while (const std::optional event = window.pollEvent()) {
+		// event for closing the window
+		if (event->is<sf::Event::Closed>()) {
+			window.close();
+		}
 
-	while (window.isOpen())
-	{
-		ui.render();
-		while (const std::optional event = window.pollEvent())
-		{
-			// event for closing the window
-			if (event->is<sf::Event::Closed>()) {
-				window.close();
-			}
-
-			if (gameLogic.getCurrentGameState() == GameState::Playing) {
-
-				if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
-					if (buttonPressed->button == sf::Mouse::Button::Left) {
-						// Handle left mouse button pressed events here
-						sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-						if (auto* field = ui.getClickedField(mousePosition)) {
-							std::cout << "Mouse button pressed at: " << mousePosition.x << ", " << mousePosition.y << std::endl; // Debugging output
-
-							// Check if there already is a field selected -> if so, check if the move is valid, if not mark current field as selected (if it is occupied)
-							if (auto* selectedField = ui.getCurrentSelectedField()) {
-								if (field->getState() == FieldState::Empty) {
-									if (gameLogic.isValidMove(*selectedField, *field)) {
-										gameLogic.makeMove(*selectedField, *field);
-										ui.updateBoard(); // Update the board based on the move, i.e. the map of fields to their corresponding circles
-										if (gameLogic.solutionFound()) {
-											soundManager.playGameWonSound(); // Play game won sound
-											std::cout << "Solution found! Congratulations!" << std::endl;
-											gameLogic.setGameState(GameState::GameWon);
-											break;
-										}
-										if (!gameLogic.movesAvailable()) {
-											soundManager.playGameLostSound(); // Play game lost sound
-											std::cout << "No moves available! Game over!" << std::endl;
-											gameLogic.setGameState(GameState::GameLost);
-											break;
-										}
-										soundManager.playCorrectMoveSound(); // Play correct move sound (if the game was not won or lost)
+		if (gameLogic.getCurrentGameState() == GameState::Playing) {
+			if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+				if (buttonPressed->button == sf::Mouse::Button::Left) {
+					// Handle left mouse button pressed events here
+					sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+					if (auto* field = ui.getClickedField(mousePosition)) {
+						std::cout << "Mouse button pressed at: " << mousePosition.x << ", " << mousePosition.y << std::endl; // Debugging output
+						// Check if there already is a field selected -> if so, check if the move is valid, if not mark current field as selected (if it is occupied)
+						if (auto* selectedField = ui.getCurrentSelectedField()) {
+							if (field->getState() == FieldState::Empty) {
+								if (gameLogic.isValidMove(*selectedField, *field)) {
+									gameLogic.makeMove(*selectedField, *field);
+									ui.updateBoard(); // Update the board based on the move, i.e. the map of fields to their corresponding circles
+									if (gameLogic.solutionFound()) {
+										soundManager.playGameWonSound(); // Play game won sound
+										std::cout << "Solution found! Congratulations!" << std::endl;
+										gameLogic.setGameState(GameState::GameWon);
+										break;
 									}
-									else {
-										selectedField->setState(FieldState::Occupied);
-										ui.updateBoard();
+									if (!gameLogic.movesAvailable()) {
+										soundManager.playGameLostSound(); // Play game lost sound
+										std::cout << "No moves available! Game over!" << std::endl;
+										gameLogic.setGameState(GameState::GameLost);
+										break;
 									}
-								}
-								else {
+									soundManager.playCorrectMoveSound(); // Play correct move sound (if the game was not won or lost)
+								} else {
 									selectedField->setState(FieldState::Occupied);
 									ui.updateBoard();
 								}
+							} else {
+								selectedField->setState(FieldState::Occupied);
+								ui.updateBoard();
 							}
-							else {
-								if (field->getState() == FieldState::Occupied) {
-									field->setState(FieldState::Selected);
-									ui.updateBoard();
-								}
+						} else {
+							if (field->getState() == FieldState::Occupied) {
+								field->setState(FieldState::Selected);
+								ui.updateBoard();
 							}
-
 						}
 					}
 				}
 			}
-			else { // If tha game is over, handle the try again button click event
-				if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
-					if (buttonPressed->button == sf::Mouse::Button::Left) {
-						sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-						if (mousePosition.x >= 10 && mousePosition.x <= 160 && mousePosition.y >= 10 && mousePosition.y <= 60) {
-							gameLogic.resetGame(); // Reset the game logic
-							ui.updateBoard(); // Reset the board
-							gameLogic.setGameState(GameState::Playing); // Change game state back to playing
-						}
+		}
+		else { // If tha game is over, handle the try again button click event
+			if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+				if (buttonPressed->button == sf::Mouse::Button::Left) {
+					sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+					if (mousePosition.x >= 10 && mousePosition.x <= 160 && mousePosition.y >= 10 && mousePosition.y <= 60) {
+						gameLogic.resetGame(); // Reset the game logic
+						ui.updateBoard(); // Reset the board
+						gameLogic.setGameState(GameState::Playing); // Change game state back to playing
 					}
 				}
 			}
@@ -89,8 +76,20 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 	}
 }
 
-int main()
-{
+
+/**
+	Implements the game loop that handles events, updates the game state, and renders the UI.
+*/
+static void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManager) {
+	sf::RenderWindow& window = ui.getRenderWindow();
+
+	while (window.isOpen()) {
+		ui.render();
+		handleEvents(window, gameLogic, ui, soundManager);
+	}
+}
+
+int main() {
 	GameLogic gameLogic{}; // Initialize the game logic
 	UserInterface ui(gameLogic); // Initialize the user interface with the game logic
 	SoundManager soundManager; // Initialize the sound manager
