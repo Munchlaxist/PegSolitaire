@@ -5,11 +5,6 @@
 #include "Field.h"
 #include "GameLogic.h"
 
-enum class GameState {
-	Playing,
-	GameOver
-};
-
 
 /**
 	Specifies the user interface for the Peg Solitaire game (Prototype!).
