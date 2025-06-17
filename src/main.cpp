@@ -12,7 +12,6 @@
 void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManager) {
 	sf::RenderWindow& window = ui.getRenderWindow();
 	ui.drawBoard(); // Draw the initial board
-	GameState gameState = GameState::Playing;
 
 	while (window.isOpen())
 	{
@@ -23,7 +22,7 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 				window.close();
 			}
 
-			if (gameState == GameState::Playing) {
+			if (gameLogic.getCurrentGameState() == GameState::Playing) {
 
 				if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
 					if (buttonPressed->button == sf::Mouse::Button::Left) {
@@ -42,7 +41,7 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 										if (gameLogic.solutionFound()) {
 											soundManager.playGameWonSound(); // Play game won sound
 											std::cout << "Solution found! Congratulations!" << std::endl;
-											gameState = GameState::GameOver; // TODO actually you won, that needs to be adapted later on
+											gameLogic.setGameState(GameState::GameWon);
 											ui.syncBoard();
 											ui.drawBoard();
 											ui.displayGameWonText(); // Draw the game won text
@@ -52,7 +51,7 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 										if (!gameLogic.movesAvailable()) {
 											soundManager.playGameLostSound(); // Play game lost sound
 											std::cout << "No moves available! Game over!" << std::endl;
-											gameState = GameState::GameOver;
+											gameLogic.setGameState(GameState::GameLost);
 											ui.syncBoard();
 											ui.drawBoard();
 											ui.displayGameOverText(); // Draw the game lost text
@@ -93,7 +92,7 @@ void gameLoop(GameLogic& gameLogic, UserInterface& ui, SoundManager& soundManage
 							gameLogic.resetGame(); // Reset the game logic
 							ui.syncBoard(); // Reset the board
 							ui.drawBoard();
-							gameState = GameState::Playing; // Change game state back to playing
+							gameLogic.setGameState(GameState::Playing); // Change game state back to playing
 						}
 					}
 				}
