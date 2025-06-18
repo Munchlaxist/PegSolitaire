@@ -1,8 +1,11 @@
 #include <iostream>
 #include <array>
 #include <string_view>
+#include <vector>
+#include "Move.h"
+#include <chrono>
 
-static const std::array<std::array<int, 7>, 7> defaultBoard = { {
+static std::array<std::array<int, 7>, 7> defaultBoard = { {
 	{-1, -1, 1, 1, 1, -1, -1},
 	{-1, -1, 1, 1, 1, -1, -1},
 	{ 1,  1, 1, 1, 1,  1,  1},
@@ -15,7 +18,8 @@ static const std::array<std::array<int, 7>, 7> defaultBoard = { {
 
 class PegSolitaireSolver {
 private:
-	std::array<std::array<int, 7>, 7>& m_board_state; // representation of the 7x7 board
+	std::array<std::array<int, 7>, 7> m_board_state; // representation of the 7x7 board
+	std::vector<Move> solution{};
 	int m_moves{ 0 };
 	
 
@@ -27,7 +31,14 @@ public:
 		Right
 	};
 
-	PegSolitaireSolver(std::array<std::array<int, 7>, 7> board_state = defaultBoard) : m_board_state{ board_state } {};
+	PegSolitaireSolver(std::array<std::array<int, 7>, 7>& board_state = defaultBoard) : m_board_state{ board_state } {};
+
+	std::vector<Move>& getSolutionMoves() {
+		/**
+		* return the solution moves made to solve the peg solitaire puzzle.
+		*/
+		return solution;
+	}
 
 	const std::string_view getDirectionString(const Direction& direction) const {
 		/**
@@ -67,7 +78,7 @@ public:
 		
 	}
 
-	bool isValidMove(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
+	bool isValidMoveSolver(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
 		/**
 		* check if the next move is valid, i.e. the peg can jump over another peg and land in an empty space.
 		*/
@@ -99,7 +110,7 @@ public:
 		return true;
 	}
 
-	void makeMove(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
+	void makeMoveSolver(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
 		/**
 		* make the given move by updating the board state.
 		*/
@@ -108,21 +119,25 @@ public:
 			m_board_state[position.first][position.second] = 0;
 			m_board_state[position.first - 1][position.second] = 0;
 			m_board_state[position.first - 2][position.second] = 1;
+			solution.push_back(Move{ std::pair<int, int>(position.first, position.second), std::pair<int, int>(position.first - 1, position.second), std::pair<int, int>(position.first - 2, position.second) });
 			break;
 		case Direction::Down:
 			m_board_state[position.first][position.second] = 0;
 			m_board_state[position.first + 1][position.second] = 0;
 			m_board_state[position.first + 2][position.second] = 1;
+			solution.push_back(Move{ std::pair<int, int>(position.first, position.second), std::pair<int, int>(position.first + 1, position.second), std::pair<int, int>(position.first + 2, position.second) });
 			break;
 		case Direction::Left:
 			m_board_state[position.first][position.second] = 0;
 			m_board_state[position.first][position.second - 1] = 0;
 			m_board_state[position.first][position.second - 2] = 1;
+			solution.push_back(Move{ std::pair<int, int>(position.first, position.second), std::pair<int, int>(position.first, position.second-1), std::pair<int, int>(position.first, position.second-1) });
 			break;
 		case Direction::Right:
 			m_board_state[position.first][position.second] = 0;
 			m_board_state[position.first][position.second + 1] = 0;
 			m_board_state[position.first][position.second + 2] = 1;
+			solution.push_back(Move{ std::pair<int, int>(position.first, position.second), std::pair<int, int>(position.first, position.second+1), std::pair<int, int>(position.first, position.second+2) });
 			break;
 		default:
 			break;
@@ -130,7 +145,7 @@ public:
 		++m_moves;
 	}
 
-	void undoMove(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
+	void undoMoveSolver(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
 		/**
 		* undo the given move by reverting the board state to its previous state.
 		*/
@@ -159,6 +174,7 @@ public:
 			break;
 		}
 		--m_moves;
+		solution.pop_back();
 	}
 
 	void printMove(std::pair<std::size_t, std::size_t>& position, const Direction& direction) {
@@ -184,10 +200,15 @@ public:
 		}
 	}
 
-	bool findSolution() {
+	bool findSolution(const std::chrono::time_point<std::chrono::system_clock>& startTime, std::chrono::milliseconds& timeout) {
 		/**
 		* find a solution to the peg solitaire puzzle using backtracking.
 		*/
+		std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
+		if (std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime) > timeout) {
+			std::cout << "Timeout reached. No solution found." << std::endl;
+			return false;
+		}
 		if (foundSolution()) {
 			return true;
 		}
@@ -196,13 +217,13 @@ public:
 				if (m_board_state[row][col] == 1) {
 					std::pair<std::size_t, std::size_t> position = {row, col};
 					for (const auto& direction : { Direction::Up, Direction::Down, Direction::Left, Direction::Right }) {
-						if (isValidMove(position, direction)) {
-							makeMove(position, direction);
-							if (findSolution()) {
+						if (isValidMoveSolver(position, direction)) {
+							makeMoveSolver(position, direction);
+							if (findSolution(startTime, timeout)) {
 								printMove(position, direction);
 								return true;
 							}
-							undoMove(position, direction);
+							undoMoveSolver(position, direction);
 						}
 					}
 				}
@@ -211,18 +232,20 @@ public:
 		return false;
 	}
 
+	
 	void solvePegSolitaire() {
-		/**
-		* solve the peg solitaire puzzle and print the moves being made (if found).
-		*/
+		std::chrono::milliseconds timeout(10000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 		std::cout << "Solving Peg Solitaire..." << std::endl;
-		if (findSolution()) {
+		if (findSolution(startTime, timeout)) {
 			std::cout << "Solution found!" << std::endl;
 		}
 		else {
 			std::cout << "No solution found." << std::endl;
 		}
 	}
+	
+	
 	
 
 };
