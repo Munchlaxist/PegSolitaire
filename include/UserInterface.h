@@ -4,6 +4,7 @@
 #include <map>
 #include "Field.h"
 #include "GameLogic.h"
+#include "Move.h"
 
 
 /**
@@ -71,6 +72,11 @@ public:
 		Create and draw a game won text on the game window.
 	*/
 	void drawGameWonText();
+
+	/**
+		Highlights the next possible move to find a valid solution.
+	*/
+	void highlightHint(Move& move);
 
 	/**
 		Clears, draws and displays the game window for the next frame.

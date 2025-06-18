@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "UserInterface.h"
+#include "Move.h"
 
 
 UserInterface::UserInterface(GameLogic& gameLogic) : m_gameLogic{ gameLogic } {
@@ -122,6 +123,17 @@ void UserInterface::drawGameWonText() {
 	gameWonText.setFillColor(sf::Color::Red); // Set text color
 	gameWonText.setPosition(sf::Vector2f(200.f, 20.f)); // Set text position
 	m_window.draw(gameWonText);
+}
+
+void UserInterface::highlightHint(Move& move) {
+	for (Field& field : m_gameLogic.getBoard()) {
+		if (field.getPosition() == move.from) {
+			fieldToShape[&field].setFillColor(sf::Color::Yellow);
+		}
+		if (field.getPosition() == move.to) {
+			fieldToShape[&field].setFillColor(sf::Color::Green);
+		}
+	}
 }
 
 void UserInterface::render() {
