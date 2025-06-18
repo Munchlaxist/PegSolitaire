@@ -99,6 +99,12 @@ public:
 	bool solutionFound();
 
 	/**
+		Converts the current board state into a format suitable for the PegSolitaireSolver.
+		\return A 7x7 array representing the board, where -1 indicates an invalid field, 0 indicates an empty field and 1 indicates a n occued field
+	*/
+	std::array<std::array<int, 7>, 7>& convertBoardToSolverBoardFormat();
+
+	/**
 		Resets the game to its initial state, restoring the default board configuration.
 	*/
 	void resetGame();
