@@ -2,6 +2,8 @@
 #include <array>
 #include <utility>
 #include "Field.h"
+#include <stack>
+#include "Move.h"
 
 /**
 	Describes the possible states of the game.
@@ -21,6 +23,7 @@ enum class GameState {
 class GameLogic {
 private:
 	std::array<Field, 33> m_board{}; // Represents the board (33 fields in total) with 7x7-grid positions
+	std::stack<Move> m_moveHistory{}; // Stack to keep track of moves made during the game for undo functionality
 	GameState m_gameState{ GameState::Playing }; // Current state of the game
 	static constexpr std::array<std::array<int, 7>, 7> defaultBoard{ {
 	{-1, -1, 1, 1, 1, -1, -1},
@@ -76,8 +79,12 @@ public:
 		\param selectedField The field from which the move is made (the selected field)
 		\param field The field to which the move is made (the target field)
 	*/
-	void makeMove(Field& selectedField, Field& field); 
+	void makeMove(Field& selectedField, Field& field);
 
+	/**
+		Undoes the last move made in the game, restoring the previous state of the board.
+	*/
+	void undoMove();
 
 	/**
 		Checks if there are any available moves left on the board.
