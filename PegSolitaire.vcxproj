@@ -29,6 +29,7 @@
   <ItemGroup>
     <ClInclude Include="include\Field.h" />
     <ClInclude Include="include\GameLogic.h" />
+    <ClInclude Include="include\Move.h" />
     <ClInclude Include="include\SoundManager.h" />
     <ClInclude Include="include\UserInterface.h" />
   </ItemGroup>
