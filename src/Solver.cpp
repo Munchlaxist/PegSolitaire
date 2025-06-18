@@ -131,7 +131,7 @@ public:
 			m_board_state[position.first][position.second] = 0;
 			m_board_state[position.first][position.second - 1] = 0;
 			m_board_state[position.first][position.second - 2] = 1;
-			solution.push_back(Move{ std::pair<int, int>(position.first, position.second), std::pair<int, int>(position.first, position.second-1), std::pair<int, int>(position.first, position.second-1) });
+			solution.push_back(Move{ std::pair<int, int>(position.first, position.second), std::pair<int, int>(position.first, position.second-1), std::pair<int, int>(position.first, position.second-2) });
 			break;
 		case Direction::Right:
 			m_board_state[position.first][position.second] = 0;
