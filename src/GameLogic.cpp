@@ -3,6 +3,7 @@
 #include "Field.h"
 #include <stdexcept>
 #include "GameLogic.h"
+#include "Move.h"
 
 
 GameLogic::GameLogic() {
@@ -99,6 +100,7 @@ void GameLogic::makeMove(Field& selectedField, Field& field) {
 		selectedField.setState(FieldState::Empty);
 		field.setState(FieldState::Occupied);
 		jumpedOverField.setState(FieldState::Empty);
+		m_moveHistory.push(Move(selectedFieldPosition, jumpedOverField.getPosition(), nextFieldPosition));
 	}
 	else if (std::get<0>(selectedFieldPosition) + 2 == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) == std::get<1>(nextFieldPosition)) {
 		// Then we jump down - set the new states of the fields accordingly
@@ -106,6 +108,7 @@ void GameLogic::makeMove(Field& selectedField, Field& field) {
 		selectedField.setState(FieldState::Empty);
 		field.setState(FieldState::Occupied);
 		jumpedOverField.setState(FieldState::Empty);
+		m_moveHistory.push(Move(selectedFieldPosition, jumpedOverField.getPosition(), nextFieldPosition));
 	}
 	else if (std::get<0>(selectedFieldPosition) == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) - 2 == std::get<1>(nextFieldPosition)) {
 		// Then we jump to the left - set the new states of the fields accordingly
@@ -113,6 +116,7 @@ void GameLogic::makeMove(Field& selectedField, Field& field) {
 		selectedField.setState(FieldState::Empty);
 		field.setState(FieldState::Occupied);
 		jumpedOverField.setState(FieldState::Empty);
+		m_moveHistory.push(Move(selectedFieldPosition, jumpedOverField.getPosition(), nextFieldPosition));
 	}
 	else if (std::get<0>(selectedFieldPosition) == std::get<0>(nextFieldPosition) && std::get<1>(selectedFieldPosition) + 2 == std::get<1>(nextFieldPosition)) {
 		// Then we jump to the right - set the new states of the fields accordingly
@@ -120,6 +124,20 @@ void GameLogic::makeMove(Field& selectedField, Field& field) {
 		selectedField.setState(FieldState::Empty);
 		field.setState(FieldState::Occupied);
 		jumpedOverField.setState(FieldState::Empty);
+		m_moveHistory.push(Move(selectedFieldPosition, jumpedOverField.getPosition(), nextFieldPosition));
+	}
+}
+
+void GameLogic::undoMove() {
+	if (!m_moveHistory.empty()) {
+		Move lastMove = m_moveHistory.top();
+		m_moveHistory.pop();
+		Field& selectedField = getField(lastMove.from);
+		Field& jumpedOverField = getField(lastMove.over);
+		Field& nextField = getField(lastMove.to);
+		selectedField.setState(FieldState::Occupied);
+		jumpedOverField.setState(FieldState::Occupied);
+		nextField.setState(FieldState::Empty);
 	}
 }
 
@@ -148,6 +166,9 @@ bool GameLogic::solutionFound() {
 }
 
 void GameLogic::resetGame() {
+	m_gameState = GameState::Playing; // Reset the game state to playing
+	m_moveHistory = std::stack<Move>(); // Reset the move history for the new game
+	// Reset the board to the default state
 	std::size_t index = 0;
 	for (std::size_t row = 0; row < 7; ++row) {
 		for (std::size_t col = 0; col < 7; ++col) {
