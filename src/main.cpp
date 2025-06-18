@@ -18,6 +18,15 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 		}
 
 		if (gameLogic.getCurrentGameState() == GameState::Playing) {
+			// Handle event to undo the previous move when Z is pressed
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::Z) {
+					gameLogic.undoMove();
+					ui.updateBoard(); // Update the board after undoing the move
+					//soundManager.playUndoSound(); // TODO Play undo sound
+				}
+			}
+			// Handle mouse button pressed events to do moves
 			if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
 				if (buttonPressed->button == sf::Mouse::Button::Left) {
 					// Handle left mouse button pressed events here
@@ -61,14 +70,14 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 				}
 			}
 		}
-		else { // If tha game is over, handle the try again button click event
+		// Handle button pressed events to try again when the game is over
+		else {
 			if (const auto* buttonPressed = event->getIf<sf::Event::MouseButtonPressed>()) {
 				if (buttonPressed->button == sf::Mouse::Button::Left) {
 					sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 					if (mousePosition.x >= 10 && mousePosition.x <= 160 && mousePosition.y >= 10 && mousePosition.y <= 60) {
-						gameLogic.resetGame(); // Reset the game logic
+						gameLogic.resetGame(); // Reset the game logic to default state
 						ui.updateBoard(); // Reset the board
-						gameLogic.setGameState(GameState::Playing); // Change game state back to playing
 					}
 				}
 			}
