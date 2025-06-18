@@ -165,6 +165,26 @@ bool GameLogic::solutionFound() {
 	return true;
 }
 
+std::array<std::array<int, 7>, 7>& GameLogic::convertBoardToSolverBoardFormat() {
+	std::array<std::array<int, 7>, 7> solverBoard{}; // Initialize a 7x7 board with all -1
+	for (std::size_t row = 0; row < 7; ++row) {
+		for (std::size_t col = 0; col < 7; ++col) {
+			solverBoard[row][col] = -1; 
+		}
+	}
+
+	for (Field& field : m_board) {
+		std::pair<int, int> position = field.getPosition();
+		if (field.getState() == FieldState::Occupied || field.getState() == FieldState::Selected) {
+			solverBoard[std::get<0>(position)][std::get<1>(position)] = 1; // Occupied fields are represented by 1, Selected can only be occupied
+		}
+		else {
+			solverBoard[std::get<0>(position)][std::get<1>(position)] = 0; // Empty fields are represented by 0
+		}
+	}
+	return solverBoard;
+}
+
 void GameLogic::resetGame() {
 	m_gameState = GameState::Playing; // Reset the game state to playing
 	m_moveHistory = std::stack<Move>(); // Reset the move history for the new game
