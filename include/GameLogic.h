@@ -48,6 +48,12 @@ public:
 	std::array<Field, 33>& getBoard();
 
 	/**
+		Gets the current move history of the game.
+		\return A reference to the stack containing the moves made during the game
+	*/
+	std::stack<Move>& getMoveHistory();
+
+	/**
 		Gets the current state of the game.
 		\return The current game state (Playing, GameWon, GameLost)
 	*/

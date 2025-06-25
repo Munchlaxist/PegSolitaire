@@ -32,6 +32,10 @@ std::array<Field, 33>& GameLogic::getBoard() {
 	return m_board;
 }
 
+std::stack<Move>& GameLogic::getMoveHistory() {
+	return m_moveHistory;
+}
+
 GameState& GameLogic::getCurrentGameState() {
 	return m_gameState;
 }
