@@ -63,6 +63,7 @@ void UserInterface::updateBoard() {
 		else if (field.getState() == FieldState::Selected) {
 			fieldToShape[&field].setFillColor(sf::Color::Red); // Change color to indicate selected field
 		}
+		fieldToShape[&field].setOutlineColor(sf::Color::Black); // Change color to indicate occupied field
 	}
 }
 
@@ -131,7 +132,7 @@ void UserInterface::highlightHint(Move& move) {
 			fieldToShape[&field].setFillColor(sf::Color::Yellow);
 		}
 		if (field.getPosition() == move.to) {
-			fieldToShape[&field].setFillColor(sf::Color::Green);
+			fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
 		}
 	}
 }
