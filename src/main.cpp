@@ -22,10 +22,10 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 		if (gameLogic.getCurrentGameState() == GameState::Playing) {
 			// Handle event to undo the previous move when Z is pressed
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
-				if (keyPressed->code == sf::Keyboard::Key::Z) {
+				if (keyPressed->code == sf::Keyboard::Key::Z and !gameLogic.getMoveHistory().empty()) {
 					gameLogic.undoMove();
 					ui.updateBoard(); // Update the board after undoing the move
-					//soundManager.playUndoSound(); // TODO Play undo sound
+					soundManager.playUndoMoveSound();
 				}
 			}
 			// Handle event to give a hint for the next move when H is pressed
