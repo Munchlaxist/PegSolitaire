@@ -4,6 +4,15 @@ My goal is not only to implement the game, but to also extend it with multiple f
 # What is already done?
 I have implemented already the basic game logic and a basic UI. You could already play and restart the game.<br/>
 My main goal was to have a clear seperation of game logic and user interface for easier understandability and readability.
+# Current TODOs within this project?
+## Animation bar
+The goal is to have an animation bar when the player wants a hint for the next move (which leads to a valid solution).
+If there is no solution found (because of calculation timeout or no possible solution anymore) this is displayed
+## Optimize backtracking algorithm
+The solver is relatively simple, i.e. not that fast and I need to upgrade this.
+## New variants of peg solitaire fields
+English variant is the current one, but I also want to add the european variant and the diamond variant.
+The field will be choosen by the player.
 # What are my plans?
 There is no fixed release yet. It is my first public project in GitHub, so I have much to learn.</br>
 But I plan to have it at some point. For more specific plans like game advancements and documentation you can just check out the "Issues".<br/>
