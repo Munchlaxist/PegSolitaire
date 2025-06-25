@@ -9,12 +9,14 @@ class SoundManager {
 private:
 	// Initialize sound buffers and sounds here such that they can be efficiently reused
 	sf::SoundBuffer correctMoveBuffer;
+	sf::SoundBuffer undoMoveBuffer;
 	sf::SoundBuffer winBuffer;
 	sf::SoundBuffer loseBuffer;
 
 	sf::Sound correctMoveSound{ correctMoveBuffer };
 	sf::Sound winSound{ winBuffer };
 	sf::Sound loseSound{ loseBuffer };
+	sf::Sound undoMoveSound{ undoMoveBuffer };
 
 public:
 	SoundManager();
@@ -33,5 +35,10 @@ public:
 		Play a sound when the player loses the game.
 	*/
 	void playGameLostSound();
+
+	/**
+		Play a sound when the player undoes a move.
+	*/
+	void playUndoMoveSound();
 
 };

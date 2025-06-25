@@ -14,6 +14,9 @@ SoundManager::SoundManager() {
 	if (!loseBuffer.loadFromFile("assets/sounds/game_lost.mp3")) {
 		throw std::runtime_error("Failed to load lose sound.");
 	}
+	if (!undoMoveBuffer.loadFromFile("assets/sounds/undo_move.mp3")) {
+		throw std::runtime_error("Failed to load undo move sound.");
+	}
 }
 
 void SoundManager::playCorrectMoveSound() {
@@ -26,4 +29,8 @@ void SoundManager::playGameWonSound() {
 
 void SoundManager::playGameLostSound() {
 	loseSound.play();
+}
+
+void SoundManager::playUndoMoveSound() {
+	undoMoveSound.play();
 }
