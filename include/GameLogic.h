@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <array>
 #include <utility>
 #include "Field.h"
@@ -17,23 +18,62 @@ enum class GameState {
 	GameLost,
 };
 
+enum class BoardType {
+	English,		// Standard English Peg Solitaire board
+	European,		// European variant of the Peg Solitaire board
+	Asymmetric,		// Diamond-shaped Peg Solitaire board
+	SmallDiamond,	// Small Diamond-shaped Peg Solitaire board
+};
+
 /**
 	Implementation of the game logic for the Peg Solitaire game.
 */
 class GameLogic {
 private:
-	std::array<Field, 33> m_board{}; // Represents the board (33 fields in total) with 7x7-grid positions
+	BoardType m_boardType{BoardType::English};
+	std::vector<Field> m_board{}; // Represents the board (33 fields in total in english, 37 in european, 32 in diamond, 39 in asymmetric) with 7x7-grid positions
 	std::stack<Move> m_moveHistory{}; // Stack to keep track of moves made during the game for undo functionality
 	GameState m_gameState{ GameState::Playing }; // Current state of the game
-	static constexpr std::array<std::array<int, 7>, 7> defaultBoard{ {
-	{-1, -1, 1, 1, 1, -1, -1},
-	{-1, -1, 1, 1, 1, -1, -1},
-	{ 1,  1, 1, 1, 1,  1,  1},
-	{ 1,  1, 1, 0, 1,  1,  1},
-	{ 1,  1, 1, 1, 1,  1,  1},
-	{-1, -1, 1, 1, 1, -1, -1},
-	{-1, -1, 1, 1, 1, -1, -1},
+
+	static constexpr std::array<std::array<int, 7>, 7> defaultBoardEnglish{ {
+	{-1, -1,  1,  1,  1, -1, -1},
+	{-1, -1,  1,  1,  1, -1, -1},
+	{ 1,  1,  1,  1,  1,  1,  1},
+	{ 1,  1,  1,  0,  1,  1,  1},
+	{ 1,  1,  1,  1,  1,  1,  1},
+	{-1, -1,  1,  1,  1, -1, -1},
+	{-1, -1,  1,  1,  1, -1, -1},
 	} }; // Describes the initial state of the board when represented as a 7x7 grid
+	static constexpr std::array<std::array<int, 7>, 7> defaultBoardEuropean{ {
+	{-1, -1,  0,  1,  1, -1, -1},
+	{-1,  1,  1,  1,  1,  1, -1},
+	{ 1,  1,  1,  1,  1,  1,  1},
+	{ 1,  1,  1,  1,  1,  1,  1},
+	{ 1,  1,  1,  1,  1,  1,  1},
+	{-1,  1,  1,  1,  1,  1, -1},
+	{-1, -1,  1,  1,  1, -1, -1},
+	} };
+	static constexpr std::array<std::array<int, 8>, 8> defaultBoardAsymmetric{ {
+	{-1, -1,  1,  1,  1, -1, -1, -1},
+	{-1, -1,  1,  1,  1, -1, -1, -1},
+	{-1, -1,  1,  1,  1, -1, -1, -1},
+	{ 1,  1,  1,  1,  1,  1,  1,  1},
+	{ 1,  1,  1,  0,  1,  1,  1,  1},
+	{ 1,  1,  1,  1,  1,  1,  1,  1},
+	{-1, -1,  1,  1,  1, -1, -1, -1},
+	{-1, -1,  1,  1,  1, -1, -1, -1},
+	} };
+	static constexpr std::array<std::array<int, 7>, 8> defaultBoardSmallDiamond{ {
+	{-1, -1, -1,  1, -1, -1, -1},
+	{-1, -1,  1,  1,  1, -1, -1},
+	{-1,  1,  1,  1,  1,  1, -1},
+	{ 1,  1,  1,  0,  1,  1,  1},
+	{ 1,  1,  1,  1,  1,  1,  1},
+	{-1,  1,  1,  1,  1,  1, -1},
+	{-1, -1,  1,  1,  1, -1, -1},
+	{-1, -1, -1,  1, -1, -1, -1},
+	} };
+
 public:
 
 	/**
@@ -45,7 +85,7 @@ public:
 		Gets the current state of the board.
 		\return A reference to the array representing the board as fields
 	*/
-	std::array<Field, 33>& getBoard();
+	std::vector<Field>& getBoard();
 
 	/**
 		Gets the current move history of the game.
@@ -64,6 +104,38 @@ public:
 		\param state The new game state to set
 	*/
 	void setGameState(GameState state);
+
+	/**
+		Gets the current board type.
+		\return The current board type (English, European, Asymmetric, SmallDiamond)
+	*/
+	BoardType& getBoardType();
+
+	/**
+		Sets the board type for the game.
+		\param type The new board type to set
+	*/
+	void setBoardType(BoardType type);
+
+	/**
+		Initializes the board based on the english variant of peg solitaire.
+	*/
+	void initializeEnglishBoard();
+
+	/**
+		Initializes the board based on the european variant of peg solitaire.
+	*/
+	void initializeEuropeanBoard();
+
+	/**
+		Initializes the board based on the small diamond variant of peg solitaire.
+	*/
+	void initializeSmallDiamondBoard();
+
+	/**
+		Initializes the board based on the asymmetric variant of peg solitaire.
+	*/
+	void initializeAsymmetricBoard();
 
 	/**
 		Gets the field at a specific position on the board.

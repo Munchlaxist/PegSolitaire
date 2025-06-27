@@ -8,27 +8,24 @@
 
 GameLogic::GameLogic() {
 	// Initialize the game logic with the default board state
-	std::size_t index = 0;
 	for (std::size_t row = 0; row < 7; ++row) {
 		for (std::size_t col = 0; col < 7; ++col) {
-			if (defaultBoard[row][col] == 1) {
-				m_board[index].setState(FieldState::Occupied);
-				m_board[index].setPosition(std::make_pair(row, col));
+			if (defaultBoardEnglish[row][col] == 1) {
+				Field field{ FieldState::Occupied, std::make_pair(row, col) };
+				m_board.push_back(field);
 			}
-			else if (defaultBoard[row][col] == 0) {
-				m_board[index].setState(FieldState::Empty);
-				m_board[index].setPosition(std::make_pair(row, col));
+			else if (defaultBoardEnglish[row][col] == 0) {
+				Field field{ FieldState::Empty, std::make_pair(row, col) };
+				m_board.push_back(field);
 			}
 			else {
 				continue; // Skip invalid fields
 			}
-			m_board[index].setPosition(std::make_pair(row, col));
-			++index;
 		}
 	}
 }
 
-std::array<Field, 33>& GameLogic::getBoard() {
+std::vector<Field>& GameLogic::getBoard() {
 	return m_board;
 }
 
@@ -42,6 +39,80 @@ GameState& GameLogic::getCurrentGameState() {
 
 void GameLogic::setGameState(GameState state) {
 	m_gameState = state;
+}
+
+BoardType& GameLogic::getBoardType() {
+	return m_boardType;
+}
+
+void GameLogic::setBoardType(BoardType type) {
+	m_boardType = type;
+}
+
+void GameLogic::initializeEnglishBoard() {
+	for (std::size_t row = 0; row < 7; ++row) {
+		for (std::size_t col = 0; col < 7; ++col) {
+			if (defaultBoardEnglish[row][col] == 1) {
+				Field field{ FieldState::Occupied, std::make_pair(row, col) };
+				m_board.push_back(field);
+			}
+			else if (defaultBoardEnglish[row][col] == 0) {
+				Field field{ FieldState::Empty, std::make_pair(row, col) };
+				m_board.push_back(field);
+			}
+			else {
+				continue; // Skip invalid fields
+			}
+		}
+	}
+}
+
+void GameLogic::initializeEuropeanBoard() {
+	for (std::size_t row = 0; row < 7; ++row) {
+		for (std::size_t col = 0; col < 7; ++col) {
+			if (defaultBoardEuropean[row][col] == 1) {
+				m_board.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
+			}
+			else if (defaultBoardEuropean[row][col] == 0) {
+				m_board.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
+			}
+			else {
+				continue; // Skip invalid fields
+			}
+		}
+	}
+}
+
+void GameLogic::initializeSmallDiamondBoard() {
+	for (std::size_t row = 0; row < 8; ++row) {
+		for (std::size_t col = 0; col < 7; ++col) {
+			if (defaultBoardSmallDiamond[row][col] == 1) {
+				m_board.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
+			}
+			else if (defaultBoardSmallDiamond[row][col] == 0) {
+				m_board.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
+			}
+			else {
+				continue; // Skip invalid fields
+			}
+		}
+	}
+}
+
+void GameLogic::initializeAsymmetricBoard() {
+	for (std::size_t row = 0; row < 8; ++row) {
+		for (std::size_t col = 0; col < 8; ++col) {
+			if (defaultBoardAsymmetric[row][col] == 1) {
+				m_board.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
+			}
+			else if (defaultBoardAsymmetric[row][col] == 0) {
+				m_board.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
+			}
+			else {
+				continue; // Skip invalid fields
+			}
+		}
+	}
 }
 
 Field& GameLogic::getField(std::pair<int, int> position) {
@@ -161,16 +232,37 @@ bool GameLogic::movesAvailable() {
 }
 
 bool GameLogic::solutionFound() {
-	for (Field& field : m_board) {
-		if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(3, 3)) {
-			return false; // If any field is still occupied besides the one in the center, the solution is not found
+	switch (m_boardType) {
+	case BoardType::English:
+	case BoardType::SmallDiamond:
+		for (Field& field : m_board) {
+			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(3, 3)) {
+				return false; // If any field is still occupied besides the one in the center, the solution is not found
+			}
 		}
+		break;
+	case BoardType::European:
+		for (Field& field : m_board) {
+			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(0, 4)) {
+				return false; // If any field is still occupied besides the one in the bottom right corner, the solution is not found
+			}
+		}
+		break;
+	case BoardType::Asymmetric:
+		for (Field& field : m_board) {
+			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(4, 3)) {
+				return false; // If any field is still occupied besides the one in the center, the solution is not found
+			}
+		}
+		break;
+	default:
+		break;
 	}
 	return true;
 }
 
 std::array<std::array<int, 7>, 7>& GameLogic::convertBoardToSolverBoardFormat() {
-	std::array<std::array<int, 7>, 7> solverBoard{}; // Initialize a 7x7 board with all -1
+	std::array<std::array<int, 7>, 7> solverBoard = {}; // Initialize a 7x7 board with all -1
 	for (std::size_t row = 0; row < 7; ++row) {
 		for (std::size_t col = 0; col < 7; ++col) {
 			solverBoard[row][col] = -1; 
@@ -192,21 +284,22 @@ std::array<std::array<int, 7>, 7>& GameLogic::convertBoardToSolverBoardFormat() 
 void GameLogic::resetGame() {
 	m_gameState = GameState::Playing; // Reset the game state to playing
 	m_moveHistory = std::stack<Move>(); // Reset the move history for the new game
-	// Reset the board to the default state
-	std::size_t index = 0;
-	for (std::size_t row = 0; row < 7; ++row) {
-		for (std::size_t col = 0; col < 7; ++col) {
-			if (defaultBoard[row][col] == 1) {
-				m_board[index].setState(FieldState::Occupied);
-			}
-			else if (defaultBoard[row][col] == 0) {
-				m_board[index].setState(FieldState::Empty);
-			}
-			else {
-				continue; // Skip invalid fields
-			}
-			m_board[index].setPosition(std::make_pair(row, col));
-			++index;
-		}
+	m_board.clear();
+
+	switch (m_boardType) {
+	case BoardType::English:
+		initializeEnglishBoard();
+		break;
+	case BoardType::European:
+		initializeEuropeanBoard();
+		break;
+	case BoardType::Asymmetric:
+		initializeAsymmetricBoard();
+		break;
+	case BoardType::SmallDiamond:
+		initializeSmallDiamondBoard();
+		break;
+	default:
+		break;
 	}
 }
