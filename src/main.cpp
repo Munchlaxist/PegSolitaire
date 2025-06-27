@@ -28,6 +28,37 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 					soundManager.playUndoMoveSound();
 				}
 			}
+
+			// Change board representation
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::A) {
+					gameLogic.setBoardType(BoardType::English);
+					gameLogic.resetGame();
+					ui.resetFieldToShape();
+				}
+			}
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::S) {
+					gameLogic.setBoardType(BoardType::European);
+					gameLogic.resetGame();
+					ui.resetFieldToShape();
+				}
+			}
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::D) {
+					gameLogic.setBoardType(BoardType::SmallDiamond);
+					gameLogic.resetGame();
+					ui.resetFieldToShape();
+				}
+			}
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::F) {
+					gameLogic.setBoardType(BoardType::Asymmetric);
+					gameLogic.resetGame();
+					ui.resetFieldToShape();
+				}
+			}
+
 			// Handle event to give a hint for the next move when H is pressed
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::H) {
