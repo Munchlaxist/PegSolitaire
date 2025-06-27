@@ -83,4 +83,9 @@ public:
 	*/
 	void render();
 
+	/**
+		Resets the field shapes to match the current type of the game board.
+	*/
+	void resetFieldToShape();
+
 };

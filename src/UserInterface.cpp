@@ -27,11 +27,9 @@ UserInterface::UserInterface(GameLogic& gameLogic) : m_gameLogic{ gameLogic } {
 	}
 }
 
-
 sf::RenderWindow& UserInterface::getRenderWindow() {
 	return m_window;
 }
-
 
 void UserInterface::drawBackground(std::filesystem::path filename) {
 	m_window.clear();
@@ -44,13 +42,11 @@ void UserInterface::drawBackground(std::filesystem::path filename) {
 	m_window.draw(backgroundSprite);
 }
 
-
 void UserInterface::drawBoard() {
 	for (auto& field : m_gameLogic.getBoard()) {
 		m_window.draw(fieldToShape[&field]);
 	}
 }
-
 
 void UserInterface::updateBoard() {
 	for (auto& field : m_gameLogic.getBoard()) {
@@ -67,7 +63,6 @@ void UserInterface::updateBoard() {
 	}
 }
 
-
 Field* UserInterface::getClickedField(const sf::Vector2i& mousePosition) {
 	for (auto& field : m_gameLogic.getBoard()) {
 		if (fieldToShape[&field].getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosition))) {
@@ -77,7 +72,6 @@ Field* UserInterface::getClickedField(const sf::Vector2i& mousePosition) {
 	return nullptr;
 }
 
-
 Field* UserInterface::getCurrentSelectedField() {
 	for (auto& field : m_gameLogic.getBoard()) {
 		if (field.getState() == FieldState::Selected) {
@@ -86,7 +80,6 @@ Field* UserInterface::getCurrentSelectedField() {
 	}
 	return nullptr;
 }
-
 
 void UserInterface::drawTryAgainButton() {
 	sf::RectangleShape tryAgainButton(sf::Vector2f(150.f, 50.f)); // Create a button with size 150x50 pixels
@@ -149,4 +142,35 @@ void UserInterface::render() {
 		drawTryAgainButton();
 	}
 	m_window.display();
+}
+
+void UserInterface::resetFieldToShape() {
+	fieldToShape.clear();
+	for (Field& field : m_gameLogic.getBoard()) {
+		sf::CircleShape circle(20.f); // Every game field is represented by a circle with radius 20 pixels
+		switch (m_gameLogic.getBoardType()) {
+		case BoardType::English:
+		case BoardType::European:
+		case BoardType::SmallDiamond:
+		case BoardType::Asymmetric:
+			if (field.getState() == FieldState::Occupied) {
+				circle.setFillColor(sf::Color::Blue);
+				circle.setOutlineColor(sf::Color::Black);
+				circle.setOutlineThickness(1.f);
+				circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50))); // Adjust position based on the specific field
+				fieldToShape[&field] = circle; // Map the field to its circle representation
+			}
+			else if (field.getState() == FieldState::Empty) {
+				circle.setFillColor(sf::Color::Transparent);
+				circle.setOutlineColor(sf::Color::Black);
+				circle.setOutlineThickness(1.f);
+				circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50)));
+				fieldToShape[&field] = circle;
+			}
+			break;
+		default:
+			throw std::runtime_error("Unsupported board type for peg solitaire.");
+			break;
+		}
+	}
 }
