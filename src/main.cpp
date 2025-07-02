@@ -107,8 +107,19 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 						break;
 					}
 					case BoardType::Asymmetric:
-						std::cout << "Solving Asymmetric board..." << std::endl;
+					{
+						uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+						AsymmetricBoardSolver solver(newBoard);
+						std::chrono::milliseconds timeout(25000);
+						const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+						if (solver.solve(startTime, timeout)) {
+							std::cout << "Done computing" << std::endl;
+							std::vector<Move2>& moves = solver.getSolutionPath();
+
+							//ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+						}
 						break;
+					}
 					default:
 						break;
 					}
