@@ -144,3 +144,54 @@ protected:
 	}
 
 };
+
+
+
+class SmallDiamondBoardSolver : public Solver {
+private:
+    const std::array<Move2, 72> m_allMovePatterns = { {
+        // Horizontale Reihen
+        {1,2,3}, {3,2,1}, 
+        {4,5,6}, {5,6,7}, {6,5,4}, {6,7,8}, {7,6,5}, {8,7,6},
+        {9,10,11}, {10,11,12}, {11,12,13}, {11,10,9}, {12,13,14}, {12,11,10}, {13,14,15}, {13,12,11}, {14,13,12}, {15,14,13},
+		{16,17,18}, {17,18,19}, {18,19,20}, {19,20,21}, {20,21,22}, {18,17,16}, {19,18,17}, {20,19,18}, {21,20,19}, {22,21,20},
+        {23,24,25}, {24,25,26}, {25,26,27}, {25,24,23}, {26,25,24}, {27,26,25},
+        {28,29,30}, {30,29,28},
+
+        // Vertikale Sprünge
+        {0,2,6}, 
+        {1,5,11}, {2,6,12}, {3,7,13},
+        {4,10,17}, {5,11,18}, {6,12,19}, {6,2,0}, {7,13,20}, {8,14,21},
+        {10,17,23}, {11,18,24}, {11,5,1}, {12,19,25}, {12,6,2}, {13,20,26}, {13,7,3}, {14,21,27}, 
+        {17,10,4}, {18,11,5}, {18,24,28}, {19,12,6}, {19,25,29}, {20,13,7}, {20,26,30}, {21,14,8},
+        {23,17,10}, {24,18,11}, {25,19,12}, {25,29,31}, {26,20,13}, {27,21,14},
+        {28,24,18}, {29,25,19}, {30,26,20},
+        {31,29,25}
+    } };
+    static const uint64_t m_solutionBoard = 0x1000;
+
+public:
+    SmallDiamondBoardSolver(uint64_t board) : Solver(board) {};
+
+protected:
+    std::vector<Move2> getNextPossibleMoves() override {
+        std::vector<Move2> possibleMoves;
+        for (const auto& move : m_allMovePatterns) {
+            if (isValidMove(move)) {
+                possibleMoves.push_back(move);
+                //std::cout << "Possible move found: " << static_cast<int>(move.from) << " -> " << move.to << " over " << move.over << std::endl;
+            }
+        }
+        //std::cout << "Total possible moves: " << possibleMoves.size() << std::endl;
+        return possibleMoves;
+    }
+
+    bool foundSolution() override {
+        return m_board == m_solutionBoard;
+    }
+
+    void canonical() override {
+        // TODO: Implement symmetry reduction logic here later on
+    }
+
+};
