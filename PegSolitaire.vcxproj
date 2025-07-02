@@ -23,7 +23,6 @@
     <ClCompile Include="src\GameLogic.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\NewSolver.cpp" />
-    <ClCompile Include="src\Solver.cpp" />
     <ClCompile Include="src\SoundManager.cpp" />
     <ClCompile Include="src\UserInterface.cpp" />
   </ItemGroup>
