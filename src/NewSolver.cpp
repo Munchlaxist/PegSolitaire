@@ -44,7 +44,7 @@ protected:
         }
 
         std::vector<Move2> candidateMoves = getNextPossibleMoves(board);
-		std::cout << "Possible moves count: " << candidateMoves.size() << std::endl;
+		//std::cout << "Possible moves count: " << candidateMoves.size() << std::endl;
         for (const Move2& move : candidateMoves) {
 			//std::cout << "Trying move: " << move.from << " -> " << move.to << " over " << move.over << std::endl;
             if (isValidMove(board, move)) {
