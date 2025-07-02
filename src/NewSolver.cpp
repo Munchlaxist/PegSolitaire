@@ -80,7 +80,7 @@ protected:
         m_board &= ~(1ULL << move.to);
     }
 
-    bool isValidMove(const Move2& move) {
+    bool isValidMove(const Move2& move) const {
         //std::cout << board << std::endl;
         return ((m_board & (1ULL << move.from)) && (m_board & (1ULL << move.over)) && !(m_board & (1ULL << move.to)));
     }
