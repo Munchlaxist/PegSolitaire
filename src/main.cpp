@@ -63,15 +63,42 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 			// Handle event to give a hint for the next move when H is pressed
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::H) {
-					uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
-					EnglishBoardSolver solver(newBoard);
-					std::chrono::milliseconds timeout(25000);
-					const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-					if (solver.solve(startTime, timeout)) {
-						std::cout << "Done computing" << std::endl;
-						std::vector<Move2>& moves = solver.getSolutionPath();
-						
-						//ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+					switch(gameLogic.getBoardType()) {
+					case BoardType::English:
+					{
+						uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+						EnglishBoardSolver solver(newBoard);
+						std::chrono::milliseconds timeout(25000);
+						const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+						if (solver.solve(startTime, timeout)) {
+							std::cout << "Done computing" << std::endl;
+							std::vector<Move2>& moves = solver.getSolutionPath();
+
+							//ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+						}
+						break;
+					}
+					case BoardType::European:
+						break;
+					case BoardType::SmallDiamond:
+						{
+							uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+							SmallDiamondBoardSolver solver(newBoard);
+							std::chrono::milliseconds timeout(25000);
+							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+							if (solver.solve(startTime, timeout)) {
+								std::cout << "Done computing" << std::endl;
+								std::vector<Move2>& moves = solver.getSolutionPath();
+
+								//ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+							}
+							break;
+						}
+						case BoardType::Asymmetric:
+							std::cout << "Solving Asymmetric board..." << std::endl;
+							break;
+						default:
+							break;
 					}
 				}
 			}
