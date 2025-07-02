@@ -2,6 +2,7 @@
 #include <array>
 #include <cmath>
 #include "Field.h"
+#include <map>
 #include <stdexcept>
 #include "GameLogic.h"
 #include "Move.h"
@@ -25,6 +26,48 @@ GameLogic::GameLogic() {
 		}
 	}
 }
+
+const std::map<std::pair<int, int>, uint8_t> GameLogic::englishGridIdxMap = {
+	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
+	{std::make_pair(1,2), 3}, {std::make_pair(1,3), 4}, {std::make_pair(1,4), 5},
+	{std::make_pair(2,0), 6}, {std::make_pair(2,1), 7}, {std::make_pair(2,2), 8}, {std::make_pair(2,3), 9}, {std::make_pair(2,4), 10}, {std::make_pair(2,5), 11}, {std::make_pair(2,6), 12},
+	{std::make_pair(3,0), 13}, {std::make_pair(3,1), 14}, {std::make_pair(3,2), 15}, {std::make_pair(3,3), 16}, {std::make_pair(3,4), 17}, {std::make_pair(3,5), 18}, {std::make_pair(3,6), 19},
+	{std::make_pair(4,0), 20}, {std::make_pair(4,1), 21}, {std::make_pair(4,2), 22}, {std::make_pair(4,3), 23}, {std::make_pair(4,4), 24}, {std::make_pair(4,5), 25}, {std::make_pair(4,6), 26},
+	{std::make_pair(5,2), 27}, {std::make_pair(5,3), 28}, {std::make_pair(5,4), 29},
+	{std::make_pair(6,2), 30}, {std::make_pair(6,3), 31}, {std::make_pair(6,4), 32},
+};
+
+const std::map<std::pair<int, int>, uint8_t> GameLogic::europeanGridIdxMap = {
+	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
+	{std::make_pair(1,1), 3}, {std::make_pair(1,2), 4}, {std::make_pair(1,3), 5}, {std::make_pair(1,4), 6}, {std::make_pair(1,5), 7},
+	{std::make_pair(2,0), 8}, {std::make_pair(2,1), 9}, {std::make_pair(2,2), 10}, {std::make_pair(2,3), 11}, {std::make_pair(2,4), 12}, {std::make_pair(2,5), 13}, {std::make_pair(2,6), 14},
+	{std::make_pair(3,0), 15}, {std::make_pair(3,1), 16}, {std::make_pair(3,2), 17}, {std::make_pair(3,3), 18}, {std::make_pair(3,4), 19}, {std::make_pair(3,5), 20}, {std::make_pair(3,6), 21},
+	{std::make_pair(4,0), 22}, {std::make_pair(4,1), 23}, {std::make_pair(4,2), 24}, {std::make_pair(4,3), 25}, {std::make_pair(4,4), 26}, {std::make_pair(4,5), 27}, {std::make_pair(4,6), 28},
+	{std::make_pair(5,1), 29}, {std::make_pair(5,2), 30}, {std::make_pair(5,3), 31}, {std::make_pair(5,4), 32}, {std::make_pair(5,5), 33},
+	{std::make_pair(6,2), 34}, {std::make_pair(6,3), 35}, {std::make_pair(6,4), 36},
+};
+
+const std::map<std::pair<int, int>, uint8_t> GameLogic::asymmetricGridIdxMap = {
+	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
+	{std::make_pair(1,2), 3}, {std::make_pair(1,3), 4}, {std::make_pair(1,4), 5},
+	{std::make_pair(2,2), 6}, {std::make_pair(2,3), 7}, {std::make_pair(2,4), 8},
+	{std::make_pair(3,0), 9}, {std::make_pair(3,1), 10}, {std::make_pair(3,2), 11}, {std::make_pair(3,3), 12}, {std::make_pair(3,4), 13}, {std::make_pair(3,5), 14}, {std::make_pair(3,6), 15}, {std::make_pair(3,7), 16},
+	{std::make_pair(4,0), 17}, {std::make_pair(4,1), 18}, {std::make_pair(4,2), 19}, {std::make_pair(4,3), 20}, {std::make_pair(4,4), 21}, {std::make_pair(4,5), 22}, {std::make_pair(4,6), 23}, {std::make_pair(4,7), 24},
+	{std::make_pair(5,0), 25}, {std::make_pair(5,1), 26}, {std::make_pair(5,2), 27}, {std::make_pair(5,3), 28}, {std::make_pair(5,4), 29}, {std::make_pair(5,5), 30}, {std::make_pair(5,6), 31}, {std::make_pair(5,7), 32},
+	{std::make_pair(6,2), 33}, {std::make_pair(6,3), 34}, {std::make_pair(6,4), 35},
+	{std::make_pair(7,2), 36}, {std::make_pair(7,3), 37}, {std::make_pair(7,4), 38},
+};
+
+const std::map<std::pair<int, int>, uint8_t> GameLogic::smallDiamondGridIdxMap = {
+	{std::make_pair(0,3), 0},
+	{std::make_pair(1,2), 1}, {std::make_pair(1,3), 2}, {std::make_pair(1,4), 3},
+	{std::make_pair(2,1), 4}, {std::make_pair(2,2), 5}, {std::make_pair(2,3), 6}, {std::make_pair(2,4), 7}, {std::make_pair(2,5), 8},
+	{std::make_pair(3,0), 9}, {std::make_pair(3,1), 10}, {std::make_pair(3,2), 11}, {std::make_pair(3,3), 12}, {std::make_pair(3,4), 13}, {std::make_pair(3,5), 14}, {std::make_pair(3,6), 15},
+	{std::make_pair(4,0), 16}, {std::make_pair(4,1), 17}, {std::make_pair(4,2), 18}, {std::make_pair(4,3), 19}, {std::make_pair(4,4), 20}, {std::make_pair(4,5), 21}, {std::make_pair(4,6), 22},
+	{std::make_pair(5,1), 23}, {std::make_pair(5,2), 24}, {std::make_pair(5,3), 25}, {std::make_pair(5,4), 26}, {std::make_pair(5,5), 27},
+	{std::make_pair(6,2), 28}, {std::make_pair(6,3), 29}, {std::make_pair(6,4), 30},
+	{std::make_pair(7,3), 31},
+};
 
 std::vector<Field>& GameLogic::getBoard() {
 	return m_board;

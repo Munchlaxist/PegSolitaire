@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <map>
 #include <array>
 #include <utility>
 #include "Field.h"
@@ -75,6 +76,10 @@ private:
 	} };
 
 public:
+	static const std::map<std::pair<int, int>, uint8_t> englishGridIdxMap;
+	static const std::map<std::pair<int, int>, uint8_t> europeanGridIdxMap;
+	static const std::map<std::pair<int, int>, uint8_t> asymmetricGridIdxMap;
+	static const std::map<std::pair<int, int>, uint8_t> smallDiamondGridIdxMap;
 
 	/**
 		Constructor for the GameLogic class, where the board is initialized with the default board state.
