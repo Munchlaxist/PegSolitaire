@@ -94,8 +94,6 @@ protected:
 };
 
 
-
-
 class EnglishBoardSolver : public Solver {
 private:
     const std::array<Move2, 76> m_allMovePatterns = {{
@@ -146,7 +144,6 @@ protected:
 };
 
 
-
 class SmallDiamondBoardSolver : public Solver {
 private:
     const std::array<Move2, 72> m_allMovePatterns = { {
@@ -172,6 +169,55 @@ private:
 
 public:
     SmallDiamondBoardSolver(uint64_t board) : Solver(board) {};
+
+protected:
+    std::vector<Move2> getNextPossibleMoves() override {
+        std::vector<Move2> possibleMoves;
+        for (const auto& move : m_allMovePatterns) {
+            if (isValidMove(move)) {
+                possibleMoves.push_back(move);
+                //std::cout << "Possible move found: " << static_cast<int>(move.from) << " -> " << move.to << " over " << move.over << std::endl;
+            }
+        }
+        //std::cout << "Total possible moves: " << possibleMoves.size() << std::endl;
+        return possibleMoves;
+    }
+
+    bool foundSolution() override {
+        return m_board == m_solutionBoard;
+    }
+
+    void canonical() override {
+        // TODO: Implement symmetry reduction logic here later on
+    }
+
+};
+
+
+class EuropeanBoardSolver : public Solver {
+private:
+    const std::array<Move2, 92> m_allMovePatterns = { {
+        // Horizontale Reihen
+        {0,1,2}, {2,1,0},
+        {3,4,5}, {4,5,6}, {5,6,7}, {5,4,3}, {6,5,4}, {7,6,5},
+        {8,9,10}, {9,10,11}, {10,11,12}, {11,12,13}, {12,13,14}, {10,9,8}, {11,10,9}, {12,11,10}, {13,12,11}, {14,13,12},
+        {15,16,17}, {16,17,18}, {17,18,19}, {18,19,20}, {19,20,21}, {17,16,15}, {18,17,16}, {19,18,17}, {20,19,18}, {21,20,19},
+		{22,23,24}, {23,24,25}, {24,25,26}, {25,26,27}, {26,27,28}, {24,23,22}, {25,24,23}, {26,25,24}, {27,26,25}, {28,27,26},
+        {29,30,31}, {30,31,32}, {31,32,33}, {31,30,29}, {32,31,30}, {33,32,31},
+        {34,35,36}, {36,35,34},
+        // Vertikale Sprünge
+        {0,4,10}, {1,5,11}, {2,6,12},
+        {3,9,16}, {4,10,17}, {5,11,18}, {6,12,19}, {7,13,20},
+        {8,15,22}, {9,16,23}, {10,17,24}, {10,4,0}, {11,18,25}, {11,5,1}, {12,19,26}, {12,6,2}, {13,20,27}, {14,21,28},
+        {16,9,3}, {16,23,29}, {17,10,4}, {17,24,30}, {18,11,5}, {18,25,31}, {19,12,6}, {19,26,32}, {20,13,7}, {20,27,33},
+        {22,15,8}, {23,16,9}, {24,17,10}, {24,30,34}, {25,18,11}, {25,31,35}, {26,19,12}, {26,32,36}, {27,20,13}, {28,21,14},
+        {29,23,16}, {30,24,17}, {31,25,18}, {32,26,19}, {33,27,20},
+        {34,30,24}, {35,31,25}, {36,32,26}
+    } };
+    static const uint64_t m_solutionBoard = 0x1000000000;
+
+public:
+    EuropeanBoardSolver(uint64_t board) : Solver(board) {};
 
 protected:
     std::vector<Move2> getNextPossibleMoves() override {
