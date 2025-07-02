@@ -244,7 +244,7 @@ bool GameLogic::solutionFound() {
 		break;
 	case BoardType::European:
 		for (Field& field : m_board) {
-			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(0, 4)) {
+			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(6, 4)) {
 				return false; // If any field is still occupied besides the one in the bottom right corner, the solution is not found
 			}
 		}
