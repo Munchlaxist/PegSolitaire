@@ -1,5 +1,6 @@
 #include <utility>
 #include <array>
+#include <cmath>
 #include "Field.h"
 #include <stdexcept>
 #include "GameLogic.h"
@@ -261,22 +262,16 @@ bool GameLogic::solutionFound() {
 	return true;
 }
 
-std::array<std::array<int, 7>, 7>& GameLogic::convertBoardToSolverBoardFormat() {
-	std::array<std::array<int, 7>, 7> solverBoard = {}; // Initialize a 7x7 board with all -1
-	for (std::size_t row = 0; row < 7; ++row) {
-		for (std::size_t col = 0; col < 7; ++col) {
-			solverBoard[row][col] = -1; 
-		}
-	}
-
+uint64_t& GameLogic::convertBoardToSolverBoardFormat() {
+	uint64_t solverBoard { 0 };
+	int exponent = 0;
+	
 	for (Field& field : m_board) {
 		std::pair<int, int> position = field.getPosition();
 		if (field.getState() == FieldState::Occupied || field.getState() == FieldState::Selected) {
-			solverBoard[std::get<0>(position)][std::get<1>(position)] = 1; // Occupied fields are represented by 1, Selected can only be occupied
+			solverBoard += static_cast<uint64_t>(std::pow(2, exponent));
 		}
-		else {
-			solverBoard[std::get<0>(position)][std::get<1>(position)] = 0; // Empty fields are represented by 0
-		}
+		++exponent;
 	}
 	return solverBoard;
 }
