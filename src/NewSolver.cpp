@@ -241,3 +241,54 @@ protected:
     }
 
 };
+
+
+class AsymmetricBoardSolver : public Solver {
+private:
+    const std::array<Move2, 96> m_allMovePatterns = { {
+        // Horizontale Reihen
+        {0,1,2}, {2,1,0},
+        {3,4,5}, {5,4,3},
+        {6,7,8}, {8,7,6},
+        {9,10,11}, {10,11,12}, {11,12,13}, {12,13,14}, {13,14,15}, {14,15,16}, {11,10,9}, {12,11,10}, {13,12,11}, {14,13,12}, {15,14,13}, {16,15,14},
+        {17,18,19}, {18,19,20}, {19,20,21}, {20,21,22}, {21,22,23}, {22,23,24}, {19,18,17}, {20,19,18}, {21,20,19}, {22,21,20}, {23,22,21}, {24,23,22},
+        {25,26,27}, {26,27,28}, {27,28,29}, {28,29,30}, {29,30,31}, {30,31,32}, {27,26,25}, {28,27,26}, {29,28,27}, {30,29,28}, {31,30,29}, {32,31,30},
+        {33,34,25}, {35,34,33},
+        {36,37,38}, {38,37,36},
+        // Vertikale Sprünge
+        {0,3,6}, {1,4,7}, {2,5,8},
+        {3,6,11}, {4,7,12}, {5,8,13},
+        {6,3,0}, {6,11,19}, {7,4,1}, {7,12,20}, {8,5,2}, {8,13,21},
+        {9,17,25}, {10,18,26}, {11,6,3}, {11,19,27}, {12,7,4}, {12,20,28}, {13,8,5}, {13,21,29}, {14,22,30}, {14,22,30}, {15,23,31}, {16,24,32},
+        {19,11,6}, {19,27,33}, {20,12,7}, {20,28,34}, {21,13,8}, {21,29,35}, {30,22,14}, {31,23,15}, {32,24,16},
+        {25,17,9}, {26,18,10}, {27,19,11}, {27,33,36}, {28,20,12}, {28,34,37}, {29,21,13}, {29,35,38}, {30,22,14}, {31,23,15}, {32,24,16},
+        {33,27,19}, {34,28,20}, {35,29,21},
+        {36,33,27}, {37,34,28}, {38,35,29}
+    } };
+    static const uint64_t m_solutionBoard = 0x100000;
+
+public:
+    AsymmetricBoardSolver(uint64_t board) : Solver(board) {};
+
+protected:
+    std::vector<Move2> getNextPossibleMoves() override {
+        std::vector<Move2> possibleMoves;
+        for (const auto& move : m_allMovePatterns) {
+            if (isValidMove(move)) {
+                possibleMoves.push_back(move);
+                //std::cout << "Possible move found: " << static_cast<int>(move.from) << " -> " << move.to << " over " << move.over << std::endl;
+            }
+        }
+        //std::cout << "Total possible moves: " << possibleMoves.size() << std::endl;
+        return possibleMoves;
+    }
+
+    bool foundSolution() override {
+        return m_board == m_solutionBoard;
+    }
+
+    void canonical() override {
+        // TODO: Implement symmetry reduction logic here later on
+    }
+
+};
