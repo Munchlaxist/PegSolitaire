@@ -64,10 +64,10 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::H) {
 					uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
-					EnglishBoardSolver solver;
-					std::chrono::milliseconds timeout(10000);
+					EnglishBoardSolver solver(newBoard);
+					std::chrono::milliseconds timeout(25000);
 					const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-					if (solver.solve(newBoard, startTime, timeout)) {
+					if (solver.solve(startTime, timeout)) {
 						std::cout << "Done computing" << std::endl;
 						std::vector<Move2>& moves = solver.getSolutionPath();
 						
