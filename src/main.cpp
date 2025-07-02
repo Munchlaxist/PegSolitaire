@@ -4,9 +4,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/System.hpp>
-#include "Solver.cpp"
+//#include "Solver.cpp"
 #include <iostream>
 #include <chrono>
+#include "NewSolver.cpp"
 
 
 /**
@@ -62,13 +63,15 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 			// Handle event to give a hint for the next move when H is pressed
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::H) {
-					std::array<std::array<int, 7>, 7> newBoard = gameLogic.convertBoardToSolverBoardFormat();
-					PegSolitaireSolver solver(newBoard);
+					uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+					EnglishBoardSolver solver;
 					std::chrono::milliseconds timeout(10000);
 					const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-					if (solver.findSolution(startTime, timeout)) {
-						std::vector<Move>& moves = solver.getSolutionMoves();
-						ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+					if (solver.solve(newBoard, startTime, timeout)) {
+						std::cout << "Done computing" << std::endl;
+						std::vector<Move2>& moves = solver.getSolutionPath();
+						
+						//ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
 					}
 				}
 			}
