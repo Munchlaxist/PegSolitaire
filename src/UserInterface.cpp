@@ -119,14 +119,49 @@ void UserInterface::drawGameWonText() {
 	m_window.draw(gameWonText);
 }
 
-void UserInterface::highlightHint(Move& move) {
-	for (Field& field : m_gameLogic.getBoard()) {
-		if (field.getPosition() == move.from) {
-			fieldToShape[&field].setFillColor(sf::Color::Yellow);
+void UserInterface::highlightHint(Move2& move) {
+	switch (m_gameLogic.getBoardType()) {
+	case BoardType::English:
+		for (Field& field : m_gameLogic.getBoard()) {
+			if (m_gameLogic.englishGridIdxMap.at(field.getPosition()) == move.from) {
+				fieldToShape[&field].setFillColor(sf::Color::Yellow);
+			}
+			if (m_gameLogic.englishGridIdxMap.at(field.getPosition()) == move.to) {
+				fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+			}
 		}
-		if (field.getPosition() == move.to) {
-			fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+		break;
+
+	case BoardType::European:
+		for (Field& field : m_gameLogic.getBoard()) {
+			if (m_gameLogic.europeanGridIdxMap.at(field.getPosition()) == move.from) {
+				fieldToShape[&field].setFillColor(sf::Color::Yellow);
+			}
+			if (m_gameLogic.europeanGridIdxMap.at(field.getPosition()) == move.to) {
+				fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+			}
 		}
+		break;
+	case BoardType::Asymmetric:
+		for (Field& field : m_gameLogic.getBoard()) {
+			if (m_gameLogic.asymmetricGridIdxMap.at(field.getPosition()) == move.from) {
+				fieldToShape[&field].setFillColor(sf::Color::Yellow);
+			}
+			if (m_gameLogic.asymmetricGridIdxMap.at(field.getPosition()) == move.to) {
+				fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+			}
+		}
+		break;
+	case BoardType::SmallDiamond:
+		for (Field& field : m_gameLogic.getBoard()) {
+			if (m_gameLogic.smallDiamondGridIdxMap.at(field.getPosition()) == move.from) {
+				fieldToShape[&field].setFillColor(sf::Color::Yellow);
+			}
+			if (m_gameLogic.smallDiamondGridIdxMap.at(field.getPosition()) == move.to) {
+				fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+			}
+		}
+		break;
 	}
 }
 
