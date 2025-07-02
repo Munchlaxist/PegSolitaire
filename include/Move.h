@@ -15,3 +15,15 @@ struct Move {
 		this->to = to;
 	}
 };
+
+struct Move2 {
+	uint8_t from;
+	uint8_t over;
+	uint8_t to;
+
+	Move2(uint8_t from, uint8_t over, uint8_t to) {
+		this->from = from;
+		this->over = over;
+		this->to = to;
+	}
+};
