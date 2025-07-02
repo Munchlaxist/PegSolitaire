@@ -7,17 +7,21 @@
 
 
 class Solver {
+protected:
+    uint64_t m_board;
 private:
+    
     std::unordered_set<uint64_t> m_visitedBoardStates{}; // tracks visited board states
     std::vector<Move2> m_solutionPath{}; // stores the moves of the found solution path
 
 public:
+    Solver(uint64_t board) : m_board{ board } {};
     ~Solver() = default;
 
-    bool solve(uint64_t& board, const std::chrono::time_point<std::chrono::system_clock>& startTime, std::chrono::milliseconds& timeout) {
+    bool solve(const std::chrono::time_point<std::chrono::system_clock>& startTime, std::chrono::milliseconds& timeout) {
         m_visitedBoardStates.clear();
         m_solutionPath.clear();
-        return backtrack(board, startTime, timeout);
+        return backtrack(startTime, timeout);
     }
 
     std::vector<Move2>& getSolutionPath() {
@@ -25,38 +29,38 @@ public:
     }
 
 protected:
-    bool backtrack(uint64_t& board, const std::chrono::time_point<std::chrono::system_clock>& startTime, std::chrono::milliseconds& timeout) {
+    bool backtrack(const std::chrono::time_point<std::chrono::system_clock>& startTime, std::chrono::milliseconds& timeout) {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
         if (std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime) > timeout) {
             std::cout << "Timeout reached. No solution found." << std::endl;
             return false;
         }
         
-        if (foundSolution(board)) {
+        if (foundSolution()) {
             return true;
         }
 
-        if (m_visitedBoardStates.count(board)) {
+        if (m_visitedBoardStates.count(m_board)) {
             return false;
         }
         else {
-            m_visitedBoardStates.insert(board);
+            m_visitedBoardStates.insert(m_board);
         }
 
-        std::vector<Move2> candidateMoves = getNextPossibleMoves(board);
+        std::vector<Move2> candidateMoves = getNextPossibleMoves();
 		//std::cout << "Possible moves count: " << candidateMoves.size() << std::endl;
         for (const Move2& move : candidateMoves) {
 			//std::cout << "Trying move: " << move.from << " -> " << move.to << " over " << move.over << std::endl;
-            if (isValidMove(board, move)) {
+            if (isValidMove(move)) {
                 //std::cout << "Hello";
-                board = applyMove(board, move);
+                applyMove(move);
                 m_solutionPath.push_back(move);
 
-                if (backtrack(board, startTime, timeout)) {
+                if (backtrack(startTime, timeout)) {
                     return true;
                 }
 
-                board = undoMove(board, move);
+                undoMove(move);
                 m_solutionPath.pop_back();
             }
         }
@@ -64,30 +68,28 @@ protected:
     }
 
 
-    uint64_t& applyMove(uint64_t& board, const Move2& move) {
-        board &= ~(1ULL << move.from);
-        board &= ~(1ULL << move.over);
-        board |= (1ULL << move.to);
-        return board;
+    void applyMove(const Move2& move) {
+        m_board &= ~(1ULL << move.from);
+        m_board &= ~(1ULL << move.over);
+        m_board |= (1ULL << move.to);
     }
 
-    uint64_t& undoMove(uint64_t& board, const Move2& move) {
-        board |= (1ULL << move.from);
-        board |= (1ULL << move.over);
-        board &= ~(1ULL << move.to);
-        return board;
+    void undoMove(const Move2& move) {
+        m_board |= (1ULL << move.from);
+        m_board |= (1ULL << move.over);
+        m_board &= ~(1ULL << move.to);
     }
 
-    bool isValidMove(uint64_t& board, const Move2& move) {
+    bool isValidMove(const Move2& move) {
         //std::cout << board << std::endl;
-        return ((board & (1ULL << move.from)) && (board & (1ULL << move.over)) && !(board & (1ULL << move.to)));
+        return ((m_board & (1ULL << move.from)) && (m_board & (1ULL << move.over)) && !(m_board & (1ULL << move.to)));
     }
 
-    virtual bool foundSolution(uint64_t& board) = 0;
+    virtual bool foundSolution() = 0;
 
-    virtual std::vector<Move2> getNextPossibleMoves(uint64_t& board) = 0;
+    virtual std::vector<Move2> getNextPossibleMoves() = 0;
 
-    virtual void canonical(uint64_t& board) = 0;
+    virtual void canonical() = 0;
 
 };
 
@@ -118,15 +120,13 @@ private:
     static const uint64_t m_solutionBoard = 0x10000;
 
 public:
-    EnglishBoardSolver() {
-        
-    };
+    EnglishBoardSolver(uint64_t board) : Solver(board) {};
 
 protected:
-    std::vector<Move2> getNextPossibleMoves(uint64_t& board) override {
+    std::vector<Move2> getNextPossibleMoves() override {
         std::vector<Move2> possibleMoves;
         for (const auto& move : m_allMovePatterns) {
-            if (isValidMove(board, move)) {
+            if (isValidMove(move)) {
                 possibleMoves.push_back(move);
 				//std::cout << "Possible move found: " << static_cast<int>(move.from) << " -> " << move.to << " over " << move.over << std::endl;
             }
@@ -135,11 +135,11 @@ protected:
         return possibleMoves;
     }
 
-    bool foundSolution(uint64_t& board) override {
-        return board == m_solutionBoard;
+    bool foundSolution() override {
+        return m_board == m_solutionBoard;
 	}
 
-    void canonical(uint64_t& board) override {
+    void canonical() override {
         // TODO: Implement symmetry reduction logic here later on
 	}
 
