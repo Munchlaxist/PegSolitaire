@@ -180,7 +180,7 @@ public:
 		Converts the current board state into a format suitable for the PegSolitaireSolver.
 		\return A 7x7 array representing the board, where -1 indicates an invalid field, 0 indicates an empty field and 1 indicates a n occued field
 	*/
-	uint64_t& convertBoardToSolverBoardFormat();
+	uint64_t convertBoardToSolverBoardFormat();
 
 	/**
 		Resets the game to its initial state, restoring the default board configuration.

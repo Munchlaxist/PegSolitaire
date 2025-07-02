@@ -262,7 +262,7 @@ bool GameLogic::solutionFound() {
 	return true;
 }
 
-uint64_t& GameLogic::convertBoardToSolverBoardFormat() {
+uint64_t GameLogic::convertBoardToSolverBoardFormat() {
 	uint64_t solverBoard { 0 };
 	int exponent = 0;
 	
