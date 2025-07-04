@@ -24,16 +24,13 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\Solver.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="src\UserInterface.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\SoundManager.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\NewSolver.cpp">
+    <ClCompile Include="src\Solver.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
