@@ -11,7 +11,7 @@ protected:
     uint64_t m_board;
 private:
     std::unordered_set<uint64_t> m_visitedBoardStates{}; // tracks visited board states
-    std::vector<Move2> m_solutionPath{}; // stores the moves of the found solution path
+    std::vector<MoveByte> m_solutionPath{}; // stores the moves of the found solution path
 
 public:
     Solver(uint64_t board) : m_board{ board } {};
@@ -23,7 +23,7 @@ public:
         return backtrack(startTime, timeout);
     }
 
-    std::vector<Move2>& getSolutionPath() {
+    std::vector<MoveByte>& getSolutionPath() {
         return m_solutionPath;
     }
 
@@ -46,8 +46,8 @@ protected:
             m_visitedBoardStates.insert(m_board);
         }
         
-        std::vector<Move2> candidateMoves = getNextPossibleMoves();
-        for (const Move2& move : candidateMoves) {
+        std::vector<MoveByte> candidateMoves = getNextPossibleMoves();
+        for (const MoveByte& move : candidateMoves) {
             if (isValidMove(move)) {
                 applyMove(move);
                 m_solutionPath.push_back(move);
@@ -64,25 +64,25 @@ protected:
     }
 
 
-    void applyMove(const Move2& move) {
+    void applyMove(const MoveByte& move) {
         m_board &= ~(1ULL << move.from);
         m_board &= ~(1ULL << move.over);
         m_board |= (1ULL << move.to);
     }
 
-    void undoMove(const Move2& move) {
+    void undoMove(const MoveByte& move) {
         m_board |= (1ULL << move.from);
         m_board |= (1ULL << move.over);
         m_board &= ~(1ULL << move.to);
     }
 
-    bool isValidMove(const Move2& move) const {
+    bool isValidMove(const MoveByte& move) const {
         return ((m_board & (1ULL << move.from)) && (m_board & (1ULL << move.over)) && !(m_board & (1ULL << move.to)));
     }
 
     virtual bool foundSolution() = 0;
 
-    virtual std::vector<Move2> getNextPossibleMoves() = 0;
+    virtual std::vector<MoveByte> getNextPossibleMoves() = 0;
 
     virtual void canonical() = 0;
 
@@ -92,7 +92,7 @@ protected:
 class EnglishBoardSolver : public Solver {
 private:
     static const uint64_t m_solutionBoard = 0x10000;
-    const std::array<Move2, 76> m_allMovePatterns = {{
+    const std::array<MoveByte, 76> m_allMovePatterns = {{
         // Horizontal moves
         {0,1,2}, {2,1,0},
         {3,4,5}, {5,4,3},
@@ -115,8 +115,8 @@ public:
     EnglishBoardSolver(uint64_t board) : Solver(board) {};
 
 protected:
-    std::vector<Move2> getNextPossibleMoves() override {
-        std::vector<Move2> possibleMoves;
+    std::vector<MoveByte> getNextPossibleMoves() override {
+        std::vector<MoveByte> possibleMoves;
         for (const auto& move : m_allMovePatterns) {
             if (isValidMove(move)) {
                 possibleMoves.push_back(move);
@@ -138,7 +138,7 @@ protected:
 class EuropeanBoardSolver : public Solver {
 private:
     static const uint64_t m_solutionBoard = 0x1000000000;
-    const std::array<Move2, 92> m_allMovePatterns = { {
+    const std::array<MoveByte, 92> m_allMovePatterns = { {
             // Horizontal moves
             {0,1,2}, {2,1,0},
             {3,4,5}, {4,5,6}, {5,6,7}, {5,4,3}, {6,5,4}, {7,6,5},
@@ -161,8 +161,8 @@ public:
     EuropeanBoardSolver(uint64_t board) : Solver(board) {};
 
 protected:
-    std::vector<Move2> getNextPossibleMoves() override {
-        std::vector<Move2> possibleMoves;
+    std::vector<MoveByte> getNextPossibleMoves() override {
+        std::vector<MoveByte> possibleMoves;
         for (const auto& move : m_allMovePatterns) {
             if (isValidMove(move)) {
                 possibleMoves.push_back(move);
@@ -184,7 +184,7 @@ protected:
 class AsymmetricBoardSolver : public Solver {
 private:
     static const uint64_t m_solutionBoard = 0x100000;
-    const std::array<Move2, 96> m_allMovePatterns = { {
+    const std::array<MoveByte, 96> m_allMovePatterns = { {
             // Horizontal moves
             {0,1,2}, {2,1,0},
             {3,4,5}, {5,4,3},
@@ -209,8 +209,8 @@ public:
     AsymmetricBoardSolver(uint64_t board) : Solver(board) {};
 
 protected:
-    std::vector<Move2> getNextPossibleMoves() override {
-        std::vector<Move2> possibleMoves;
+    std::vector<MoveByte> getNextPossibleMoves() override {
+        std::vector<MoveByte> possibleMoves;
         for (const auto& move : m_allMovePatterns) {
             if (isValidMove(move)) {
                 possibleMoves.push_back(move);
@@ -232,7 +232,7 @@ protected:
 class SmallDiamondBoardSolver : public Solver {
 private:
     static const uint64_t m_solutionBoard = 0x1000;
-    const std::array<Move2, 72> m_allMovePatterns = { {
+    const std::array<MoveByte, 72> m_allMovePatterns = { {
         // Horizontal moves
         {1,2,3}, {3,2,1}, 
         {4,5,6}, {5,6,7}, {6,5,4}, {6,7,8}, {7,6,5}, {8,7,6},
@@ -256,8 +256,8 @@ public:
     SmallDiamondBoardSolver(uint64_t board) : Solver(board) {};
 
 protected:
-    std::vector<Move2> getNextPossibleMoves() override {
-        std::vector<Move2> possibleMoves;
+    std::vector<MoveByte> getNextPossibleMoves() override {
+        std::vector<MoveByte> possibleMoves;
         for (const auto& move : m_allMovePatterns) {
             if (isValidMove(move)) {
                 possibleMoves.push_back(move);
