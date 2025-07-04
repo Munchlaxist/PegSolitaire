@@ -35,7 +35,7 @@ public:
 		Gets the position of the field within the game board when represented as a 7x7 grid.
 		\return The position of the field as a pair of integers (row, column)
 	*/
-	const std::pair<int, int> getPosition() const;
+	std::pair<int, int> getPosition() const;
 
 	/**
 		Sets the state of the field.

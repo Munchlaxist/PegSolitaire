@@ -8,7 +8,7 @@ const FieldState& Field::getState() const {
 	return m_state;
 }
 
-const std::pair<int, int> Field::getPosition() const {
+std::pair<int, int> Field::getPosition() const {
 	return m_position;
 }
 
