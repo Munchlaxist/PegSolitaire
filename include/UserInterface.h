@@ -36,6 +36,13 @@ public:
 	void drawBackground(std::filesystem::path filename);
 
 	/**
+		Draws the goal field at the specified row and column on the game board (depends on board type).
+		\param row The row index of the goal field
+		\param col The column index of the goal field
+	*/
+	void drawGoalField(int row, int col);
+
+	/**
 		Displays the current state of the game board.
 	*/
 	void drawBoard();

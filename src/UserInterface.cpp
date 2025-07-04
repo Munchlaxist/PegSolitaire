@@ -42,8 +42,33 @@ void UserInterface::drawBackground(std::filesystem::path filename) {
 	m_window.draw(backgroundSprite);
 }
 
+void UserInterface::drawGoalField(int row, int col) {
+	sf::RectangleShape goalShape(sf::Vector2f(40.f, 40.f)); // Create a square for the goal position
+	goalShape.setFillColor(sf::Color::Transparent);
+	goalShape.setOutlineColor(sf::Color::Black);
+	goalShape.setOutlineThickness(1.f);
+	goalShape.setPosition(sf::Vector2f(static_cast<float>(225 + col * 50), static_cast<float>(225 + row * 50)));
+	m_window.draw(goalShape); // Draw the goal position as a square
+}
+
 void UserInterface::drawBoard() {
-	for (auto& field : m_gameLogic.getBoard()) {
+	// Draw the goal field based on the board type
+	switch (m_gameLogic.getBoardType()) {
+	case BoardType::English:
+	case BoardType::SmallDiamond:
+		drawGoalField(3, 3);
+		break;
+	case BoardType::European:
+		drawGoalField(6, 4);
+		break;
+	case BoardType::Asymmetric:
+		drawGoalField(4, 3);
+		break;
+	default:
+		break;
+	}
+	// Draw the board fields
+	for (auto& field : m_gameLogic.getBoard()) {		
 		m_window.draw(fieldToShape[&field]);
 	}
 }
