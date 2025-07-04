@@ -72,7 +72,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 							if (solver.solve(startTime, timeout)) {
 								std::cout << "Done computing" << std::endl;
-								std::vector<Move2>& moves = solver.getSolutionPath();
+								std::vector<MoveByte>& moves = solver.getSolutionPath();
 								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
 							}
 							break;
@@ -85,7 +85,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 							if (solver.solve(startTime, timeout)) {
 								std::cout << "Done computing" << std::endl;
-								std::vector<Move2>& moves = solver.getSolutionPath();
+								std::vector<MoveByte>& moves = solver.getSolutionPath();
 								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
 							}
 							break;
@@ -98,7 +98,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 							if (solver.solve(startTime, timeout)) {
 								std::cout << "Done computing" << std::endl;
-								std::vector<Move2>& moves = solver.getSolutionPath();
+								std::vector<MoveByte>& moves = solver.getSolutionPath();
 								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
 							}
 							break;
@@ -111,7 +111,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 							if (solver.solve(startTime, timeout)) {
 								std::cout << "Done computing" << std::endl;
-								std::vector<Move2>& moves = solver.getSolutionPath();
+								std::vector<MoveByte>& moves = solver.getSolutionPath();
 								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
 							}
 							break;
