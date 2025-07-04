@@ -4,26 +4,18 @@
 /**
 	Represents a move in the peg solitaire game.
 */
+template <typename CoordType>
 struct Move {
-	std::pair<int, int> from;
-	std::pair<int, int> over;
-	std::pair<int, int> to;
+	CoordType from;
+	CoordType over;
+	CoordType to;
 
-	Move(std::pair<int, int> from, std::pair<int, int> over, std::pair<int, int> to) {
+	Move(CoordType from, CoordType over, CoordType to) {
 		this->from = from;
 		this->over = over;
 		this->to = to;
 	}
 };
 
-struct Move2 {
-	uint8_t from;
-	uint8_t over;
-	uint8_t to;
-
-	Move2(uint8_t from, uint8_t over, uint8_t to) {
-		this->from = from;
-		this->over = over;
-		this->to = to;
-	}
-};
+using MovePair = Move<std::pair<int, int>>; // For 2D coordinates (improved readability)
+using MoveByte = Move<uint8_t>; // For 1D coordinates (improved performance within solver)
