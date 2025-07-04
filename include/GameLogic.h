@@ -33,7 +33,7 @@ class GameLogic {
 private:
 	BoardType m_boardType{BoardType::English};
 	std::vector<Field> m_board{}; // Represents the board (33 fields in total in english, 37 in european, 32 in diamond, 39 in asymmetric) with 7x7-grid positions
-	std::stack<Move> m_moveHistory{}; // Stack to keep track of moves made during the game for undo functionality
+	std::stack<MovePair> m_moveHistory{}; // Stack to keep track of moves made during the game for undo functionality
 	GameState m_gameState{ GameState::Playing }; // Current state of the game
 
 	static constexpr std::array<std::array<int, 7>, 7> defaultBoardEnglish{ {
@@ -96,7 +96,7 @@ public:
 		Gets the current move history of the game.
 		\return A reference to the stack containing the moves made during the game
 	*/
-	std::stack<Move>& getMoveHistory();
+	std::stack<MovePair>& getMoveHistory();
 
 	/**
 		Gets the current state of the game.
