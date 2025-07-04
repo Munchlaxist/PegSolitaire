@@ -144,7 +144,7 @@ void UserInterface::drawGameWonText() {
 	m_window.draw(gameWonText);
 }
 
-void UserInterface::highlightHint(Move2& move) {
+void UserInterface::highlightHint(MoveByte& move) {
 	switch (m_gameLogic.getBoardType()) {
 	case BoardType::English:
 		for (Field& field : m_gameLogic.getBoard()) {

@@ -83,7 +83,7 @@ public:
 	/**
 		Highlights the next possible move to find a valid solution.
 	*/
-	void highlightHint(Move2& move);
+	void highlightHint(MoveByte& move);
 
 	/**
 		Clears, draws and displays the game window for the next frame.
