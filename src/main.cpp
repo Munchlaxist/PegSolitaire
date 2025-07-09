@@ -59,6 +59,13 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 					ui.resetFieldToShape();
 				}
 			}
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::G) {
+					gameLogic.setBoardType(BoardType::ArrowUp);
+					gameLogic.resetGame();
+					ui.resetFieldToShape();
+				}
+			}
 
 			// Handle event to give a hint for the next move when H is pressed
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
@@ -70,7 +77,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							EnglishBoardSolver solver(newBoard);
 							std::chrono::milliseconds timeout(25000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-							if (solver.solve(startTime, timeout)) {
+							if (solver.solve(startTime, timeout, true)) {
 								std::cout << "Done computing" << std::endl;
 								std::vector<MoveByte>& moves = solver.getSolutionPath();
 								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
@@ -83,7 +90,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							EuropeanBoardSolver solver(newBoard);
 							std::chrono::milliseconds timeout(50000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-							if (solver.solve(startTime, timeout)) {
+							if (solver.solve(startTime, timeout, true)) {
 								std::cout << "Done computing" << std::endl;
 								std::vector<MoveByte>& moves = solver.getSolutionPath();
 								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
@@ -96,7 +103,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							SmallDiamondBoardSolver solver(newBoard);
 							std::chrono::milliseconds timeout(25000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-							if (solver.solve(startTime, timeout)) {
+							if (solver.solve(startTime, timeout, true)) {
 								std::cout << "Done computing" << std::endl;
 								std::vector<MoveByte>& moves = solver.getSolutionPath();
 								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
@@ -109,13 +116,26 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							AsymmetricBoardSolver solver(newBoard);
 							std::chrono::milliseconds timeout(25000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
-							if (solver.solve(startTime, timeout)) {
+							if (solver.solve(startTime, timeout, true)) {
 								std::cout << "Done computing" << std::endl;
 								std::vector<MoveByte>& moves = solver.getSolutionPath();
 								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
 							}
 							break;
 						}
+					case BoardType::ArrowUp:
+					{
+						uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+						ArrowUpBoardSolver solver(newBoard);
+						std::chrono::milliseconds timeout(25000);
+						const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+						if (solver.solve(startTime, timeout, true)) {
+							std::cout << "Done computing" << std::endl;
+							std::vector<MoveByte>& moves = solver.getSolutionPath();
+							ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+						}
+						break;
+					}
 					default:
 						break;
 					}
