@@ -56,6 +56,7 @@ void UserInterface::drawBoard() {
 	switch (m_gameLogic.getBoardType()) {
 	case BoardType::English:
 	case BoardType::SmallDiamond:
+	case BoardType::ArrowUp:
 		drawGoalField(3, 3);
 		break;
 	case BoardType::European:
@@ -147,6 +148,7 @@ void UserInterface::drawGameWonText() {
 void UserInterface::highlightHint(MoveByte& move) {
 	switch (m_gameLogic.getBoardType()) {
 	case BoardType::English:
+	case BoardType::ArrowUp:
 		for (Field& field : m_gameLogic.getBoard()) {
 			if (m_gameLogic.englishGridIdxMap.at(field.getPosition()) == move.from) {
 				fieldToShape[&field].setFillColor(sf::Color::Yellow);
@@ -213,6 +215,7 @@ void UserInterface::resetFieldToShape() {
 		case BoardType::European:
 		case BoardType::SmallDiamond:
 		case BoardType::Asymmetric:
+		case BoardType::ArrowUp:
 			if (field.getState() == FieldState::Occupied) {
 				circle.setFillColor(sf::Color::Blue);
 				circle.setOutlineColor(sf::Color::Black);
