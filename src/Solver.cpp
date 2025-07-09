@@ -7,6 +7,13 @@
 #include "Move.h"
 
 
+enum class SearchResult {
+    SOLVED,
+    NO_SOLUTION,
+    TIMEOUT
+};
+
+
 class Solver {
 protected:
     uint64_t m_board;
@@ -24,7 +31,7 @@ public:
         m_visitedBoardStatesCount = 1;
 
         const std::chrono::time_point<std::chrono::system_clock>& debugStartTime = std::chrono::system_clock::now();
-        bool solutionFound = backtrack(startTime, timeout);
+        SearchResult solutionFound = backtrack(startTime, timeout);
         const std::chrono::time_point<std::chrono::system_clock>& debugEndTime = std::chrono::system_clock::now();
 
         if (verbose) {
@@ -32,7 +39,16 @@ public:
             std::cout << "Finding a possible solution took " << duration.count() << "secs." << std::endl;
             std::cout << "Visited board states: " << m_visitedBoardStatesCount << std::endl;
         }
-        return solutionFound;
+        if (solutionFound == SearchResult::TIMEOUT) {
+            std::cout << "Timeout reached - there might still be a solution." << std::endl;
+            return false;
+		} else if (solutionFound == SearchResult::NO_SOLUTION) {
+            std::cout << "There is no possible solution left." << std::endl;
+            return false;
+        } else {
+            std::cout << "Solution found." << std::endl;
+            return true;
+        }
     }
 
     std::vector<MoveByte>& getSolutionPath() {
@@ -40,19 +56,18 @@ public:
     }
 
 protected:
-    bool backtrack(const std::chrono::time_point<std::chrono::system_clock>& startTime, std::chrono::milliseconds& timeout) {
+    SearchResult backtrack(const std::chrono::time_point<std::chrono::system_clock>& startTime, std::chrono::milliseconds& timeout) {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
         if (std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime) > timeout) {
-            std::cout << "Timeout reached. No solution found." << std::endl;
-            return false;
+            return SearchResult::TIMEOUT;
         }
         
         if (foundSolution()) {
-            return true;
+            return SearchResult::SOLVED;
         }
         
         if (m_visitedBoardStates.count(m_board)) {
-            return false;
+            return SearchResult::NO_SOLUTION;
         }
         else {
             m_visitedBoardStates.insert(m_board);
@@ -60,19 +75,22 @@ protected:
         ++m_visitedBoardStatesCount;
         std::vector<MoveByte> candidateMoves = getNextPossibleMoves();
         for (const MoveByte& move : candidateMoves) {
-            if (isValidMove(move)) {
-                applyMove(move);
-                m_solutionPath.push_back(move);
+            applyMove(move);
+            m_solutionPath.push_back(move);
+			SearchResult result = backtrack(startTime, timeout);
 
-                if (backtrack(startTime, timeout)) {
-                    return true;
-                }
+            if (result == SearchResult::TIMEOUT) {
+                return SearchResult::TIMEOUT;
+			}
 
-                undoMove(move);
-                m_solutionPath.pop_back();
+            if (result == SearchResult::SOLVED) {
+                return SearchResult::SOLVED;
             }
+
+            undoMove(move);
+            m_solutionPath.pop_back();
         }
-        return false;
+        return SearchResult::NO_SOLUTION;
     }
 
 
