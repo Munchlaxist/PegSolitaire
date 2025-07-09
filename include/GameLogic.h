@@ -24,6 +24,7 @@ enum class BoardType {
 	European,		// European variant of the Peg Solitaire board
 	Asymmetric,		// Diamond-shaped Peg Solitaire board
 	SmallDiamond,	// Small Diamond-shaped Peg Solitaire board
+	ArrowUp,		// Arrow Up-shaped Peg Solitaire board
 };
 
 /**
@@ -74,6 +75,15 @@ private:
 	{-1, -1,  1,  1,  1, -1, -1},
 	{-1, -1, -1,  1, -1, -1, -1},
 	} };
+	static constexpr std::array<std::array<int, 7>, 7> defaultBoardArrowUp{ {
+	{-1, -1,  0,  1,  0, -1, -1},
+	{-1, -1,  1,  1,  1, -1, -1},
+	{ 0,  1,  1,  1,  1,  1,  0},
+	{ 0,  0,  0,  1,  0,  0,  0},
+	{ 0,  0,  0,  1,  0,  0,  0},
+	{-1, -1,  1,  1,  1, -1, -1},
+	{-1, -1,  1,  1,  1, -1, -1},
+	} }; // Describes the initial state of the board when represented as a 7x7 grid
 
 public:
 	static const std::map<std::pair<int, int>, uint8_t> englishGridIdxMap;
@@ -141,6 +151,11 @@ public:
 		Initializes the board based on the asymmetric variant of peg solitaire.
 	*/
 	void initializeAsymmetricBoard();
+
+	/**
+		Initializes the board based on the arrow up variant of peg solitaire.
+	*/
+	void initializeArrowUpBoard();
 
 	/**
 		Gets the field at a specific position on the board.

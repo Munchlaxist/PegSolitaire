@@ -159,6 +159,24 @@ void GameLogic::initializeAsymmetricBoard() {
 	}
 }
 
+void GameLogic::initializeArrowUpBoard() {
+	for (std::size_t row = 0; row < 7; ++row) {
+		for (std::size_t col = 0; col < 7; ++col) {
+			if (defaultBoardArrowUp[row][col] == 1) {
+				Field field{ FieldState::Occupied, std::make_pair(row, col) };
+				m_board.push_back(field);
+			}
+			else if (defaultBoardArrowUp[row][col] == 0) {
+				Field field{ FieldState::Empty, std::make_pair(row, col) };
+				m_board.push_back(field);
+			}
+			else {
+				continue; // Skip invalid fields
+			}
+		}
+	}
+}
+
 Field& GameLogic::getField(std::pair<int, int> position) {
 	for (Field& field : m_board) {
 		if (field.getPosition() == position) {
@@ -279,6 +297,7 @@ bool GameLogic::solutionFound() {
 	switch (m_boardType) {
 	case BoardType::English:
 	case BoardType::SmallDiamond:
+	case BoardType::ArrowUp:
 		for (Field& field : m_board) {
 			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(3, 3)) {
 				return false; // If any field is still occupied besides the one in the center, the solution is not found
@@ -336,6 +355,9 @@ void GameLogic::resetGame() {
 		break;
 	case BoardType::SmallDiamond:
 		initializeSmallDiamondBoard();
+		break;
+	case BoardType::ArrowUp:
+		initializeArrowUpBoard();
 		break;
 	default:
 		break;
