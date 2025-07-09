@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <algorithm>
+#include <stdexcept>
 #include "Move.h"
 
 
@@ -20,7 +21,7 @@ protected:
 private:
     std::unordered_set<uint64_t> m_visitedBoardStates{}; // tracks visited board states
     std::vector<MoveByte> m_solutionPath{}; // stores the moves of the found solution path
-    long long m_visitedBoardStatesCount{ 1 }; // counts the number of visited board states
+    int m_visitedBoardStatesCount{ 1 }; // counts the number of visited board states
 public:
     Solver(uint64_t board) : m_board{ board } {};
     ~Solver() = default;
@@ -72,6 +73,7 @@ protected:
         else {
             m_visitedBoardStates.insert(m_board);
         }
+
         ++m_visitedBoardStatesCount;
         std::vector<MoveByte> candidateMoves = getNextPossibleMoves();
         for (const MoveByte& move : candidateMoves) {
@@ -93,7 +95,6 @@ protected:
         return SearchResult::NO_SOLUTION;
     }
 
-
     void applyMove(const MoveByte& move) {
         m_board &= ~(1ULL << move.from);
         m_board &= ~(1ULL << move.over);
@@ -114,7 +115,7 @@ protected:
 
     virtual std::vector<MoveByte> getNextPossibleMoves() = 0;
 
-    virtual void canonical() = 0;
+    virtual uint64_t canonical() = 0;
 
 };
 
@@ -140,6 +141,27 @@ private:
         {27,22,15}, {28,23,16}, {29,24,17},
         {30,27,22}, {31,28,23}, {32,29,24}
     }};
+    static constexpr std::array<uint8_t, 33> m_rotation90 = {
+        12, 19, 26, 11, 18, 25, 2, 5, 10, 17, 24, 29, 32, 1, 4, 9, 16, 23, 28, 31, 0, 3, 8, 15, 22, 27, 30, 7, 14, 21, 6, 13, 20
+	};
+    static constexpr std::array<uint8_t, 33> m_rotation180 = {
+        32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+    };
+    static constexpr std::array<uint8_t, 33> m_rotation270 = {
+		20, 13, 6, 21, 14, 7, 30, 27, 22, 15, 8, 3, 0, 31, 28, 23, 16, 9, 4, 1, 32, 29, 24, 17, 10, 5, 2, 25, 18, 11, 26, 19, 12
+    };
+    static constexpr std::array<uint8_t, 33> m_reflectionH = {
+        30, 31, 32, 27, 28, 29, 20, 21, 22, 23, 24, 25, 26, 13, 14, 15, 16, 17, 18, 19, 6, 7, 8, 9, 10, 11, 12, 3, 4, 5, 0, 1, 2
+	};
+    static constexpr std::array<uint8_t, 33> m_reflectionV = {
+        2, 1, 0, 5, 4, 3, 12, 11, 10, 9, 8, 7, 6, 19, 18, 17, 16, 15, 14, 13, 26, 25, 24, 23, 22, 21, 20, 29, 28, 27, 32, 31, 30
+	};
+    static constexpr std::array<uint8_t, 33> m_reflectionMD = {
+        6, 13, 20, 7, 14, 21, 0, 3, 8, 15, 22, 27, 30, 1, 4, 9, 16, 23, 28, 31, 2, 5, 10, 17, 24, 29, 32, 11, 18, 25, 12, 19, 26
+	};
+    static constexpr std::array<uint8_t, 33> m_reflectionAD = {
+        26, 19, 12, 25, 18, 11, 32, 29, 24, 17, 10, 5, 2, 31, 28, 23, 16, 9, 4, 1, 30, 27, 22, 15, 8, 3, 0, 21, 14, 7, 20, 13, 6
+    };
 
 public:
     EnglishBoardSolver(uint64_t board) : Solver(board) {};
@@ -159,9 +181,82 @@ protected:
         return m_board == m_solutionBoard;
 	}
 
-    void canonical() override {
-        // TODO: Implement symmetry reduction logic here later on
+    uint64_t applySymmetry(std::size_t i) {
+        uint64_t rotatedBoard = 0;
+        switch (i) {
+            case 0:
+                // identity
+				return m_board;
+            case 1:
+                // 90° rotation
+                for (std::size_t j{ 0 }; j < 33; ++j) {
+                    if (m_board & (1ULL << j)) {
+                        rotatedBoard |= (1ULL << m_rotation90[j]);
+                    }
+				}
+				return rotatedBoard;
+            case 2:
+				// 180° rotation
+                for (std::size_t j{ 0 }; j < 33; ++j) {
+                    if (m_board & (1ULL << j)) {
+                        rotatedBoard |= (1ULL << m_rotation180[j]);
+                    }
+                }
+                return rotatedBoard;
+            case 3:
+				// 270° rotation
+                for (std::size_t j{ 0 }; j < 33; ++j) {
+                    if (m_board & (1ULL << j)) {
+                        rotatedBoard |= (1ULL << m_rotation270[j]);
+                    }
+                }
+                return rotatedBoard;
+            case 4:
+                // horizontal reflection
+                for (std::size_t j{ 0 }; j < 33; ++j) {
+                    if (m_board & (1ULL << j)) {
+                        rotatedBoard |= (1ULL << m_reflectionH[j]);
+                    }
+                }
+                return rotatedBoard;
+            case 5:
+				// vertical reflection
+                for (std::size_t j{ 0 }; j < 33; ++j) {
+                    if (m_board & (1ULL << j)) {
+                        rotatedBoard |= (1ULL << m_reflectionV[j]);
+                    }
+                }
+                return rotatedBoard;
+            case 6:
+                // main diagonal reflection
+                for (std::size_t j{ 0 }; j < 33; ++j) {
+                    if (m_board & (1ULL << j)) {
+                        rotatedBoard |= (1ULL << m_reflectionMD[j]);
+                    }
+                }
+                return rotatedBoard;
+            case 7:
+				// anti diagonal reflection
+                for (std::size_t j{ 0 }; j < 33; ++j) {
+                    if (m_board & (1ULL << j)) {
+                        rotatedBoard |= (1ULL << m_reflectionAD[j]);
+                    }
+                }
+                return rotatedBoard;
+            default:
+				throw std::runtime_error("Symmetry not implemented for this board type yet.");
+        }
+    }
+
+    uint64_t canonical() override {
+        std::array<uint64_t, 8> variants{};
+        for (std::size_t i{ 0 }; i < 8; ++i) {
+            variants[i] = applySymmetry(i);
+        }
+		return *std::min_element(variants.begin(), variants.end());
 	}
+
+
 };
 
 
@@ -205,8 +300,9 @@ protected:
         return m_board == m_solutionBoard;
     }
 
-    void canonical() override {
+    uint64_t canonical() override {
         // TODO: Implement symmetry reduction logic here later on
+        return m_board;
     }
 };
 
@@ -253,8 +349,9 @@ protected:
         return m_board == m_solutionBoard;
     }
 
-    void canonical() override {
+    uint64_t canonical() override {
         // TODO: Implement symmetry reduction logic here later on
+        return m_board;
     }
 };
 
@@ -300,8 +397,9 @@ protected:
         return m_board == m_solutionBoard;
     }
 
-    void canonical() override {
+    uint64_t canonical() override {
         // TODO: Implement symmetry reduction logic here later on
+        return m_board;
     }
 };
 
@@ -345,7 +443,8 @@ protected:
         return m_board == m_solutionBoard;
     }
 
-    void canonical() override {
+    uint64_t canonical() override {
         // TODO: Implement symmetry reduction logic here later on
+        return m_board;
     }
 };
