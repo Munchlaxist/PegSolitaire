@@ -20,7 +20,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 			window.close();
 		}
 
-		if (gameLogic.getCurrentGameState() == GameState::Playing) {
+		if (gameLogic.getGameState() == GameState::Playing) {
 			// Handle event to undo the previous move when Z is pressed
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::Z and !gameLogic.getMoveHistory().empty()) {
@@ -73,7 +73,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 					switch(gameLogic.getBoardType()) {
 					case BoardType::English:
 						{
-							uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+							uint64_t newBoard = gameLogic.convertBoardFormat();
 							EnglishBoardSolver solver(newBoard);
 							std::chrono::milliseconds timeout(25000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
@@ -85,7 +85,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 						}
 					case BoardType::European:
 						{
-							uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+							uint64_t newBoard = gameLogic.convertBoardFormat();
 							EuropeanBoardSolver solver(newBoard);
 							std::chrono::milliseconds timeout(50000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
@@ -97,7 +97,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 						}
 					case BoardType::SmallDiamond:
 						{
-							uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+							uint64_t newBoard = gameLogic.convertBoardFormat();
 							SmallDiamondBoardSolver solver(newBoard);
 							std::chrono::milliseconds timeout(25000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
@@ -109,7 +109,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 						}
 					case BoardType::Asymmetric:
 						{
-							uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+							uint64_t newBoard = gameLogic.convertBoardFormat();
 							AsymmetricBoardSolver solver(newBoard);
 							std::chrono::milliseconds timeout(25000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
@@ -121,7 +121,7 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 						}
 					case BoardType::ArrowUp:
 					{
-						uint64_t newBoard = gameLogic.convertBoardToSolverBoardFormat();
+						uint64_t newBoard = gameLogic.convertBoardFormat();
 						ArrowUpBoardSolver solver(newBoard);
 						std::chrono::milliseconds timeout(25000);
 						const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
