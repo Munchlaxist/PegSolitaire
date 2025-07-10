@@ -85,53 +85,6 @@ private:
 	{-1, -1,  1,  1,  1, -1, -1},
 	} }; // Describes the initial state of the board when represented as a 7x7 grid
 
-public:
-	static const std::map<std::pair<int, int>, uint8_t> englishGridIdxMap;
-	static const std::map<std::pair<int, int>, uint8_t> europeanGridIdxMap;
-	static const std::map<std::pair<int, int>, uint8_t> asymmetricGridIdxMap;
-	static const std::map<std::pair<int, int>, uint8_t> smallDiamondGridIdxMap;
-
-	/**
-		Constructor for the GameLogic class, where the board is initialized with the default board state.
-	*/
-	GameLogic();
-
-	/**
-		Gets the current state of the board.
-		\return A reference to the array representing the board as fields
-	*/
-	std::vector<Field>& getBoard();
-
-	/**
-		Gets the current move history of the game.
-		\return A reference to the stack containing the moves made during the game
-	*/
-	std::stack<MovePair>& getMoveHistory();
-
-	/**
-		Gets the current state of the game.
-		\return The current game state (Playing, GameWon, GameLost)
-	*/
-	GameState& getCurrentGameState();
-
-	/**
-		Sets the current state of the game.
-		\param state The new game state to set
-	*/
-	void setGameState(GameState state);
-
-	/**
-		Gets the current board type.
-		\return The current board type (English, European, Asymmetric, SmallDiamond)
-	*/
-	BoardType& getBoardType();
-
-	/**
-		Sets the board type for the game.
-		\param type The new board type to set
-	*/
-	void setBoardType(BoardType type);
-
 	/**
 		Initializes the board based on the english variant of peg solitaire.
 	*/
@@ -156,6 +109,52 @@ public:
 		Initializes the board based on the arrow up variant of peg solitaire.
 	*/
 	void initializeArrowUpBoard();
+
+public:
+	static const std::map<std::pair<int, int>, uint8_t> englishGridIdxMap;
+	static const std::map<std::pair<int, int>, uint8_t> europeanGridIdxMap;
+	static const std::map<std::pair<int, int>, uint8_t> asymmetricGridIdxMap;
+	static const std::map<std::pair<int, int>, uint8_t> smallDiamondGridIdxMap;
+	/**
+		Constructor for the GameLogic class, where the board is initialized with the default board state.
+	*/
+	GameLogic();
+
+	/**
+		Gets the current state of the board.
+		\return A reference to the array representing the board as fields
+	*/
+	std::vector<Field>& getBoard();
+
+	/**
+		Gets the current move history of the game.
+		\return A reference to the stack containing the moves made during the game
+	*/
+	std::stack<MovePair>& getMoveHistory();
+
+	/**
+		Gets the current state of the game.
+		\return The current game state (Playing, GameWon, GameLost)
+	*/
+	GameState& getGameState();
+
+	/**
+		Gets the current board type.
+		\return The current board type (English, European, Asymmetric, SmallDiamond)
+	*/
+	BoardType& getBoardType();
+
+	/**
+		Sets the current state of the game.
+		\param state The new game state to set
+	*/
+	void setGameState(GameState state);
+
+	/**
+		Sets the board type for the game.
+		\param type The new board type to set
+	*/
+	void setBoardType(BoardType type);
 
 	/**
 		Gets the field at a specific position on the board.
@@ -200,7 +199,7 @@ public:
 		Converts the current board state into a format suitable for the PegSolitaireSolver.
 		\return A 7x7 array representing the board, where -1 indicates an invalid field, 0 indicates an empty field and 1 indicates a n occued field
 	*/
-	uint64_t convertBoardToSolverBoardFormat();
+	uint64_t convertBoardFormat();
 
 	/**
 		Resets the game to its initial state, restoring the default board configuration.

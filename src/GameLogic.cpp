@@ -77,7 +77,7 @@ std::stack<MovePair>& GameLogic::getMoveHistory() {
 	return m_moveHistory;
 }
 
-GameState& GameLogic::getCurrentGameState() {
+GameState& GameLogic::getGameState() {
 	return m_gameState;
 }
 
@@ -324,7 +324,7 @@ bool GameLogic::solutionFound() {
 	return true;
 }
 
-uint64_t GameLogic::convertBoardToSolverBoardFormat() {
+uint64_t GameLogic::convertBoardFormat() {
 	uint64_t solverBoard { 0 };
 	int exponent = 0;
 	
