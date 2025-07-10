@@ -46,6 +46,10 @@ Generated\ Files/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
+# Documentation
+*.drawio
+*.drawio.bkp
+
 # NUnit
 *.VisualState.xml
 TestResult.xml
