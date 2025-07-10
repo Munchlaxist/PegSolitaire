@@ -14,7 +14,7 @@ class UserInterface {
 private:
 	GameLogic& m_gameLogic; // The game logic instance that manages the game state and rules
 	sf::RenderWindow m_window{ sf::VideoMode({ 800, 800 }), "Peg Solitaire", sf::Style::Titlebar | sf::Style::Close }; // The main window for the game
-	std::map<Field*, sf::CircleShape> fieldToShape{}; // Maps the game fields to their corresponding graphical shapes
+	std::map<Field*, sf::CircleShape> m_fieldToShape{}; // Maps the game fields to their corresponding graphical shapes
 
 public:
 	/**

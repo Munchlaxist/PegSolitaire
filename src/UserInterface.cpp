@@ -15,14 +15,14 @@ UserInterface::UserInterface(GameLogic& gameLogic) : m_gameLogic{ gameLogic } {
 			circle.setOutlineColor(sf::Color::Black);
 			circle.setOutlineThickness(1.f);
 			circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50))); // Adjust position based on the specific field
-			fieldToShape[&field] = circle; // Map the field to its circle representation
+			m_fieldToShape[&field] = circle; // Map the field to its circle representation
 		}
 		else if (field.getState() == FieldState::Empty) {
 			circle.setFillColor(sf::Color::Transparent);
 			circle.setOutlineColor(sf::Color::Black);
 			circle.setOutlineThickness(1.f);
 			circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50)));
-			fieldToShape[&field] = circle;
+			m_fieldToShape[&field] = circle;
 		}
 	}
 }
@@ -70,28 +70,28 @@ void UserInterface::drawBoard() {
 	}
 	// Draw the board fields
 	for (auto& field : m_gameLogic.getBoard()) {		
-		m_window.draw(fieldToShape[&field]);
+		m_window.draw(m_fieldToShape[&field]);
 	}
 }
 
 void UserInterface::updateBoard() {
 	for (auto& field : m_gameLogic.getBoard()) {
 		if (field.getState() == FieldState::Occupied) {
-			fieldToShape[&field].setFillColor(sf::Color::Blue); // Change color to indicate occupied field
+			m_fieldToShape[&field].setFillColor(sf::Color::Blue); // Change color to indicate occupied field
 		}
 		else if (field.getState() == FieldState::Empty) {
-			fieldToShape[&field].setFillColor(sf::Color::Transparent); // Change color to indicate empty field
+			m_fieldToShape[&field].setFillColor(sf::Color::Transparent); // Change color to indicate empty field
 		}
 		else if (field.getState() == FieldState::Selected) {
-			fieldToShape[&field].setFillColor(sf::Color::Red); // Change color to indicate selected field
+			m_fieldToShape[&field].setFillColor(sf::Color::Red); // Change color to indicate selected field
 		}
-		fieldToShape[&field].setOutlineColor(sf::Color::Black); // Change color to indicate occupied field
+		m_fieldToShape[&field].setOutlineColor(sf::Color::Black); // Change color to indicate occupied field
 	}
 }
 
 Field* UserInterface::getClickedField(const sf::Vector2i& mousePosition) {
 	for (auto& field : m_gameLogic.getBoard()) {
-		if (fieldToShape[&field].getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosition))) {
+		if (m_fieldToShape[&field].getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosition))) {
 			return &field; // Return reference to the clicked field
 		}
 	}
@@ -151,10 +151,10 @@ void UserInterface::highlightHint(MoveByte& move) {
 	case BoardType::ArrowUp:
 		for (Field& field : m_gameLogic.getBoard()) {
 			if (m_gameLogic.englishGridIdxMap.at(field.getPosition()) == move.from) {
-				fieldToShape[&field].setFillColor(sf::Color::Yellow);
+				m_fieldToShape[&field].setFillColor(sf::Color::Yellow);
 			}
 			if (m_gameLogic.englishGridIdxMap.at(field.getPosition()) == move.to) {
-				fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+				m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
 			}
 		}
 		break;
@@ -162,30 +162,30 @@ void UserInterface::highlightHint(MoveByte& move) {
 	case BoardType::European:
 		for (Field& field : m_gameLogic.getBoard()) {
 			if (m_gameLogic.europeanGridIdxMap.at(field.getPosition()) == move.from) {
-				fieldToShape[&field].setFillColor(sf::Color::Yellow);
+				m_fieldToShape[&field].setFillColor(sf::Color::Yellow);
 			}
 			if (m_gameLogic.europeanGridIdxMap.at(field.getPosition()) == move.to) {
-				fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+				m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
 			}
 		}
 		break;
 	case BoardType::Asymmetric:
 		for (Field& field : m_gameLogic.getBoard()) {
 			if (m_gameLogic.asymmetricGridIdxMap.at(field.getPosition()) == move.from) {
-				fieldToShape[&field].setFillColor(sf::Color::Yellow);
+				m_fieldToShape[&field].setFillColor(sf::Color::Yellow);
 			}
 			if (m_gameLogic.asymmetricGridIdxMap.at(field.getPosition()) == move.to) {
-				fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+				m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
 			}
 		}
 		break;
 	case BoardType::SmallDiamond:
 		for (Field& field : m_gameLogic.getBoard()) {
 			if (m_gameLogic.smallDiamondGridIdxMap.at(field.getPosition()) == move.from) {
-				fieldToShape[&field].setFillColor(sf::Color::Yellow);
+				m_fieldToShape[&field].setFillColor(sf::Color::Yellow);
 			}
 			if (m_gameLogic.smallDiamondGridIdxMap.at(field.getPosition()) == move.to) {
-				fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
+				m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
 			}
 		}
 		break;
@@ -196,10 +196,10 @@ void UserInterface::render() {
 	m_window.clear();
 	drawBackground("assets/images/white_oak_bg.png");
 	drawBoard();
-	if (m_gameLogic.getCurrentGameState() == GameState::GameLost) {
+	if (m_gameLogic.getGameState() == GameState::GameLost) {
 		drawGameOverText();
 		drawTryAgainButton();
-	} else if (m_gameLogic.getCurrentGameState() == GameState::GameWon) {
+	} else if (m_gameLogic.getGameState() == GameState::GameWon) {
 		drawGameWonText();
 		drawTryAgainButton();
 	}
@@ -207,7 +207,7 @@ void UserInterface::render() {
 }
 
 void UserInterface::resetFieldToShape() {
-	fieldToShape.clear();
+	m_fieldToShape.clear();
 	for (Field& field : m_gameLogic.getBoard()) {
 		sf::CircleShape circle(20.f); // Every game field is represented by a circle with radius 20 pixels
 		switch (m_gameLogic.getBoardType()) {
@@ -221,14 +221,14 @@ void UserInterface::resetFieldToShape() {
 				circle.setOutlineColor(sf::Color::Black);
 				circle.setOutlineThickness(1.f);
 				circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50))); // Adjust position based on the specific field
-				fieldToShape[&field] = circle; // Map the field to its circle representation
+				m_fieldToShape[&field] = circle; // Map the field to its circle representation
 			}
 			else if (field.getState() == FieldState::Empty) {
 				circle.setFillColor(sf::Color::Transparent);
 				circle.setOutlineColor(sf::Color::Black);
 				circle.setOutlineThickness(1.f);
 				circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50)));
-				fieldToShape[&field] = circle;
+				m_fieldToShape[&field] = circle;
 			}
 			break;
 		default:
