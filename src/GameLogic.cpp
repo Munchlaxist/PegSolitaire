@@ -14,11 +14,15 @@ std::vector<Field>& GameLogic::getBoard() {
 	return m_board->getBoardRepresentation();
 }
 
+std::unique_ptr<Board>& GameLogic::getBoardPtr() {
+	return m_board;
+}
+
 void GameLogic::setBoard(std::unique_ptr<Board> board) {
 	m_board = std::move(board);
 }
 
-const std::map<std::pair<int, int>, uint8_t>& GameLogic::getGridToIndexMap() {
+std::map<uint8_t, std::pair<int, int>>& GameLogic::getIdxToGridMap() {
 	return m_board->getGridToIndexMap();
 }
 
@@ -32,10 +36,6 @@ GameState& GameLogic::getGameState() {
 
 void GameLogic::setGameState(GameState state) {
 	m_gameState = state;
-}
-
-BoardType& GameLogic::getBoardType() {
-	return m_board->getBoardType();
 }
 
 Field& GameLogic::getField(std::pair<int, int> position) {
@@ -175,5 +175,4 @@ uint64_t GameLogic::convertBoardFormat() {
 void GameLogic::resetGame() {
 	m_gameState = GameState::Playing; // Reset the game state to playing
 	m_moveHistory = std::stack<MovePair>(); // Reset the move history for the new game
-	//m_board->initializeBoard();
 }

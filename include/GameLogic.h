@@ -39,12 +39,21 @@ public:
 
 	/**
 		Gets the current state of the board.
-		\return A reference to the array representing the board as fields
+		\return A reference to the vector representing the board as fields
 	*/
 	std::vector<Field>& getBoard();
 
+	/**
+		Gets the current board subclass as a unique pointer.
+		\return A unique pointer to the Board object representing the current board state
+	*/
+	std::unique_ptr<Board>& getBoardPtr();
+	
+	/**
+		Sets the current board to a new board instance.
+		\param board A unique pointer to the new Board object to set
+	*/
 	void setBoard(std::unique_ptr<Board> board);
-
 
 	/**
 		Gets the current move history of the game.
@@ -59,12 +68,10 @@ public:
 	GameState& getGameState();
 
 	/**
-		Gets the current board type.
-		\return The current board type (English, European, Asymmetric, SmallDiamond)
+		Gets a map that associates field indices with their corresponding grid positions on the board.
+		\return A reference to a map where the key is the field index and the value is a pair of integers representing the grid position (row, column)
 	*/
-	BoardType& getBoardType();
-
-	const std::map<std::pair<int, int>, uint8_t>& getGridToIndexMap();
+	std::map<uint8_t, std::pair<int, int>>& getIdxToGridMap();
 
 	/**
 		Sets the current state of the game.
