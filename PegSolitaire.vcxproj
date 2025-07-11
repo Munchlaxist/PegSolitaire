@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Board.cpp" />
     <ClCompile Include="src\Field.cpp" />
     <ClCompile Include="src\GameLogic.cpp" />
     <ClCompile Include="src\main.cpp" />
