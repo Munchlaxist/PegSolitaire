@@ -27,6 +27,7 @@ public:
 
 	virtual void initializeBoard() = 0;
 	virtual bool solutionFound() = 0;
+	virtual std::pair<int, int> getGoalPosition() = 0;
 	virtual std::vector<MoveByte> getNextHint(uint64_t boardState) = 0;
 };
 
@@ -72,6 +73,10 @@ public:
 			}
 		}
 		return true;
+	}
+
+	std::pair<int, int> getGoalPosition() {
+		return std::make_pair(3, 3);
 	}
 
 	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
@@ -124,6 +129,10 @@ public:
 			}
 		}
 		return true;
+	}
+
+	std::pair<int, int> getGoalPosition() {
+		return std::make_pair(6, 4);
 	}
 
 	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
@@ -179,6 +188,10 @@ public:
 		return true;
 	}
 
+	std::pair<int, int> getGoalPosition() {
+		return std::make_pair(4, 3);
+	}
+
 	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
 		AsymmetricBoardSolver solver(boardState);
 		std::chrono::milliseconds timeout(25000);
@@ -232,6 +245,10 @@ public:
 		return true;
 	}
 
+	std::pair<int, int> getGoalPosition() {
+		return std::make_pair(3, 3);
+	}
+
 	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
 		SmallDiamondBoardSolver solver(boardState);
 		std::chrono::milliseconds timeout(25000);
@@ -282,6 +299,10 @@ public:
 			}
 		}
 		return true;
+	}
+
+	std::pair<int, int> getGoalPosition() {
+		return std::make_pair(3, 3);
 	}
 
 	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
