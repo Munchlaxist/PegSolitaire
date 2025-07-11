@@ -313,3 +313,171 @@ public:
 		return solver.getSolutionPath();
 	}
 };
+
+class PyramidBoard : public Board {
+public:
+	void initializeBoard() override {
+		m_boardRepresentation.clear();
+		bool set;
+		for (unsigned char idx{ 0 }; idx < 33; ++idx) {
+			set = (m_defaultBoard >> idx) & 1;
+			if (set) {
+				// If the bit is set, the field is occupied
+				m_boardRepresentation.push_back(Field{ FieldState::Occupied, m_idxToGridMap.at(idx) });
+			}
+			else {
+				// If the bit is not set, the field is empty
+				m_boardRepresentation.push_back(Field{ FieldState::Empty, m_idxToGridMap.at(idx) });
+			}
+		}
+	}
+
+	PyramidBoard() {
+		// Initialize the SmallDiamond board representation
+		m_defaultBoard = 0x7F7C710;
+		m_idxToGridMap = {
+		{0, std::make_pair(0,2)}, {1, std::make_pair(0,3)}, {2, std::make_pair(0,4)},
+		{3, std::make_pair(1,2)}, {4, std::make_pair(1,3)}, {5, std::make_pair(1,4)},
+		{6, std::make_pair(2,0)}, {7, std::make_pair(2,1)}, {8, std::make_pair(2,2)}, {9, std::make_pair(2,3)}, {10, std::make_pair(2,4)}, {11, std::make_pair(2,5)}, {12, std::make_pair(2,6)},
+		{13, std::make_pair(3,0)}, {14, std::make_pair(3,1)}, {15, std::make_pair(3,2)}, {16, std::make_pair(3,3)}, {17, std::make_pair(3,4)}, {18, std::make_pair(3,5)}, {19, std::make_pair(3,6)},
+		{20, std::make_pair(4,0)}, {21, std::make_pair(4,1)}, {22, std::make_pair(4,2)}, {23, std::make_pair(4,3)}, {24, std::make_pair(4,4)}, {25, std::make_pair(4,5)}, {26, std::make_pair(4,6)},
+		{27, std::make_pair(5,2)}, {28, std::make_pair(5,3)}, {29, std::make_pair(5,4)},
+		{30, std::make_pair(6,2)}, {31, std::make_pair(6,3)}, {32, std::make_pair(6,4)},
+		};
+		m_boardRepresentation.resize(33);
+		initializeBoard();
+	}
+
+	bool solutionFound() override {
+		for (Field& field : m_boardRepresentation) {
+			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(3, 3)) {
+				return false; // If any field is still occupied besides the one in the center, the solution is not found
+			}
+		}
+		return true;
+	}
+
+	std::pair<int, int> getGoalPosition() {
+		return std::make_pair(3, 3);
+	}
+
+	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
+		EnglishBoardSolver solver(boardState);
+		std::chrono::milliseconds timeout(25000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+		solver.solve(startTime, timeout, true);
+		return solver.getSolutionPath();
+	}
+};
+
+class ShurikenBoard : public Board {
+public:
+	void initializeBoard() override {
+		m_boardRepresentation.clear();
+		bool set;
+		for (unsigned char idx{ 0 }; idx < 33; ++idx) {
+			set = (m_defaultBoard >> idx) & 1;
+			if (set) {
+				// If the bit is set, the field is occupied
+				m_boardRepresentation.push_back(Field{ FieldState::Occupied, m_idxToGridMap.at(idx) });
+			}
+			else {
+				// If the bit is not set, the field is empty
+				m_boardRepresentation.push_back(Field{ FieldState::Empty, m_idxToGridMap.at(idx) });
+			}
+		}
+	}
+
+	ShurikenBoard() {
+		// Initialize the SmallDiamond board representation
+		m_defaultBoard = 0x19BDFF7B3;
+		m_idxToGridMap = {
+		{0, std::make_pair(0,2)}, {1, std::make_pair(0,3)}, {2, std::make_pair(0,4)},
+		{3, std::make_pair(1,2)}, {4, std::make_pair(1,3)}, {5, std::make_pair(1,4)},
+		{6, std::make_pair(2,0)}, {7, std::make_pair(2,1)}, {8, std::make_pair(2,2)}, {9, std::make_pair(2,3)}, {10, std::make_pair(2,4)}, {11, std::make_pair(2,5)}, {12, std::make_pair(2,6)},
+		{13, std::make_pair(3,0)}, {14, std::make_pair(3,1)}, {15, std::make_pair(3,2)}, {16, std::make_pair(3,3)}, {17, std::make_pair(3,4)}, {18, std::make_pair(3,5)}, {19, std::make_pair(3,6)},
+		{20, std::make_pair(4,0)}, {21, std::make_pair(4,1)}, {22, std::make_pair(4,2)}, {23, std::make_pair(4,3)}, {24, std::make_pair(4,4)}, {25, std::make_pair(4,5)}, {26, std::make_pair(4,6)},
+		{27, std::make_pair(5,2)}, {28, std::make_pair(5,3)}, {29, std::make_pair(5,4)},
+		{30, std::make_pair(6,2)}, {31, std::make_pair(6,3)}, {32, std::make_pair(6,4)},
+		};
+		m_boardRepresentation.resize(33);
+		initializeBoard();
+	}
+
+	bool solutionFound() override {
+		for (Field& field : m_boardRepresentation) {
+			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(3, 3)) {
+				return false; // If any field is still occupied besides the one in the center, the solution is not found
+			}
+		}
+		return true;
+	}
+
+	std::pair<int, int> getGoalPosition() {
+		return std::make_pair(3, 3);
+	}
+
+	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
+		EnglishBoardSolver solver(boardState);
+		std::chrono::milliseconds timeout(25000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+		solver.solve(startTime, timeout, true);
+		return solver.getSolutionPath();
+	}
+};
+
+class PlusBoard : public Board {
+public:
+	void initializeBoard() override {
+		m_boardRepresentation.clear();
+		bool set;
+		for (unsigned char idx{ 0 }; idx < 33; ++idx) {
+			set = (m_defaultBoard >> idx) & 1;
+			if (set) {
+				// If the bit is set, the field is occupied
+				m_boardRepresentation.push_back(Field{ FieldState::Occupied, m_idxToGridMap.at(idx) });
+			}
+			else {
+				// If the bit is not set, the field is empty
+				m_boardRepresentation.push_back(Field{ FieldState::Empty, m_idxToGridMap.at(idx) });
+			}
+		}
+	}
+
+	PlusBoard() {
+		// Initialize the SmallDiamond board representation
+		m_defaultBoard = 0x1087C210;
+		m_idxToGridMap = {
+		{0, std::make_pair(0,2)}, {1, std::make_pair(0,3)}, {2, std::make_pair(0,4)},
+		{3, std::make_pair(1,2)}, {4, std::make_pair(1,3)}, {5, std::make_pair(1,4)},
+		{6, std::make_pair(2,0)}, {7, std::make_pair(2,1)}, {8, std::make_pair(2,2)}, {9, std::make_pair(2,3)}, {10, std::make_pair(2,4)}, {11, std::make_pair(2,5)}, {12, std::make_pair(2,6)},
+		{13, std::make_pair(3,0)}, {14, std::make_pair(3,1)}, {15, std::make_pair(3,2)}, {16, std::make_pair(3,3)}, {17, std::make_pair(3,4)}, {18, std::make_pair(3,5)}, {19, std::make_pair(3,6)},
+		{20, std::make_pair(4,0)}, {21, std::make_pair(4,1)}, {22, std::make_pair(4,2)}, {23, std::make_pair(4,3)}, {24, std::make_pair(4,4)}, {25, std::make_pair(4,5)}, {26, std::make_pair(4,6)},
+		{27, std::make_pair(5,2)}, {28, std::make_pair(5,3)}, {29, std::make_pair(5,4)},
+		{30, std::make_pair(6,2)}, {31, std::make_pair(6,3)}, {32, std::make_pair(6,4)},
+		};
+		m_boardRepresentation.resize(33);
+		initializeBoard();
+	}
+
+	bool solutionFound() override {
+		for (Field& field : m_boardRepresentation) {
+			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(3, 3)) {
+				return false; // If any field is still occupied besides the one in the center, the solution is not found
+			}
+		}
+		return true;
+	}
+
+	std::pair<int, int> getGoalPosition() {
+		return std::make_pair(3, 3);
+	}
+
+	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
+		EnglishBoardSolver solver(boardState);
+		std::chrono::milliseconds timeout(25000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+		solver.solve(startTime, timeout, true);
+		return solver.getSolutionPath();
+	}
+};
