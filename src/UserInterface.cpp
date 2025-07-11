@@ -54,21 +54,8 @@ void UserInterface::drawGoalField(int row, int col) {
 
 void UserInterface::drawBoard() {
 	// Draw the goal field based on the board type
-	switch (m_gameLogic.getBoardType()) {
-	case BoardType::English:
-	case BoardType::SmallDiamond:
-	case BoardType::ArrowUp:
-		drawGoalField(3, 3);
-		break;
-	case BoardType::European:
-		drawGoalField(6, 4);
-		break;
-	case BoardType::Asymmetric:
-		drawGoalField(4, 3);
-		break;
-	default:
-		break;
-	}
+	std::pair<int, int> goalPosition = m_gameLogic.getBoardPtr()->getGoalPosition();
+	drawGoalField(goalPosition.first, goalPosition.second);
 	// Draw the board fields
 	for (auto& field : m_gameLogic.getBoard()) {		
 		m_window.draw(m_fieldToShape[&field]);
@@ -146,68 +133,18 @@ void UserInterface::drawGameWonText() {
 	m_window.draw(gameWonText);
 }
 
-void UserInterface::highlightHint(MoveByte& move, const std::map<std::pair<int, int>, uint8_t>& gridToIndexMap) {
+void UserInterface::highlightHint(MoveByte& move) {
 	for (Field& field : m_gameLogic.getBoard()) {
-		std::cout << "Field position: " << field.getPosition().first << ", " << field.getPosition().second << std::endl;
-		uint8_t t = gridToIndexMap.at(field.getPosition());
-		std::cout << "Grid index: " << static_cast<int>(t) << std::endl;
-		if (gridToIndexMap.at(field.getPosition()) == move.from) {
+		std::map<uint8_t, std::pair<int, int>> idxToGridMap = m_gameLogic.getIdxToGridMap();
+		if (idxToGridMap.at(move.from) == field.getPosition()) {
 			m_fieldToShape[&field].setFillColor(sf::Color::Yellow); // Highlight the field from which the move is made
 		}
-		if (gridToIndexMap.at(field.getPosition()) == move.to) {
+		if (idxToGridMap.at(move.to) == field.getPosition()) {
 			m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow); // Highlight the field to which the move is made
 		}
 	}
 }
 
-/*
-void UserInterface::highlightHint(MoveByte& move, std::map<std::pair<int, int>, uint8_t>& gridToIndexMap) {
-	switch (m_gameLogic.getBoardType()) {
-	case BoardType::English:
-	case BoardType::ArrowUp:
-		for (Field& field : m_gameLogic.getBoard()) {
-			if (m_gameLogic.englishGridIdxMap.at(field.getPosition()) == move.from) {
-				m_fieldToShape[&field].setFillColor(sf::Color::Yellow);
-			}
-			if (m_gameLogic.englishGridIdxMap.at(field.getPosition()) == move.to) {
-				m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
-			}
-		}
-		break;
-
-	case BoardType::European:
-		for (Field& field : m_gameLogic.getBoard()) {
-			if (m_gameLogic.europeanGridIdxMap.at(field.getPosition()) == move.from) {
-				m_fieldToShape[&field].setFillColor(sf::Color::Yellow);
-			}
-			if (m_gameLogic.europeanGridIdxMap.at(field.getPosition()) == move.to) {
-				m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
-			}
-		}
-		break;
-	case BoardType::Asymmetric:
-		for (Field& field : m_gameLogic.getBoard()) {
-			if (m_gameLogic.asymmetricGridIdxMap.at(field.getPosition()) == move.from) {
-				m_fieldToShape[&field].setFillColor(sf::Color::Yellow);
-			}
-			if (m_gameLogic.asymmetricGridIdxMap.at(field.getPosition()) == move.to) {
-				m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
-			}
-		}
-		break;
-	case BoardType::SmallDiamond:
-		for (Field& field : m_gameLogic.getBoard()) {
-			if (m_gameLogic.smallDiamondGridIdxMap.at(field.getPosition()) == move.from) {
-				m_fieldToShape[&field].setFillColor(sf::Color::Yellow);
-			}
-			if (m_gameLogic.smallDiamondGridIdxMap.at(field.getPosition()) == move.to) {
-				m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow);
-			}
-		}
-		break;
-	}
-}
-*/
 void UserInterface::render() {
 	m_window.clear();
 	drawBackground("assets/images/white_oak_bg.png");
@@ -226,30 +163,19 @@ void UserInterface::resetFieldToShape() {
 	m_fieldToShape.clear();
 	for (Field& field : m_gameLogic.getBoard()) {
 		sf::CircleShape circle(20.f); // Every game field is represented by a circle with radius 20 pixels
-		switch (m_gameLogic.getBoardType()) {
-		case BoardType::English:
-		case BoardType::European:
-		case BoardType::SmallDiamond:
-		case BoardType::Asymmetric:
-		case BoardType::ArrowUp:
-			if (field.getState() == FieldState::Occupied) {
-				circle.setFillColor(sf::Color::Blue);
-				circle.setOutlineColor(sf::Color::Black);
-				circle.setOutlineThickness(1.f);
-				circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50))); // Adjust position based on the specific field
-				m_fieldToShape[&field] = circle; // Map the field to its circle representation
-			}
-			else if (field.getState() == FieldState::Empty) {
-				circle.setFillColor(sf::Color::Transparent);
-				circle.setOutlineColor(sf::Color::Black);
-				circle.setOutlineThickness(1.f);
-				circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50)));
-				m_fieldToShape[&field] = circle;
-			}
-			break;
-		default:
-			throw std::runtime_error("Unsupported board type for peg solitaire.");
-			break;
+		if (field.getState() == FieldState::Occupied) {
+			circle.setFillColor(sf::Color::Blue);
+			circle.setOutlineColor(sf::Color::Black);
+			circle.setOutlineThickness(1.f);
+			circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50))); // Adjust position based on the specific field
+			m_fieldToShape[&field] = circle; // Map the field to its circle representation
+		}
+		else if (field.getState() == FieldState::Empty) {
+			circle.setFillColor(sf::Color::Transparent);
+			circle.setOutlineColor(sf::Color::Black);
+			circle.setOutlineThickness(1.f);
+			circle.setPosition(sf::Vector2f(static_cast<float>(225 + field.getPosition().second * 50), static_cast<float>(225 + field.getPosition().first * 50)));
+			m_fieldToShape[&field] = circle;
 		}
 	}
 }
