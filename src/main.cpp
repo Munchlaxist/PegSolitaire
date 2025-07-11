@@ -70,6 +70,30 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 					ui.resetFieldToShape();
 				}
 			}
+
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::Q) {
+					gameLogic.setBoard(std::make_unique<PyramidBoard>());
+					gameLogic.resetGame();
+					ui.resetFieldToShape();
+				}
+			}
+
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::W) {
+					gameLogic.setBoard(std::make_unique<ShurikenBoard>());
+					gameLogic.resetGame();
+					ui.resetFieldToShape();
+				}
+			}
+
+			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+				if (keyPressed->code == sf::Keyboard::Key::E) {
+					gameLogic.setBoard(std::make_unique<PlusBoard>());
+					gameLogic.resetGame();
+					ui.resetFieldToShape();
+				}
+			}
 			
 			// Handle event to give a hint for the next move when H is pressed
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
