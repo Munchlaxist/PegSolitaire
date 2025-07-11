@@ -52,7 +52,7 @@ public:
         }
     }
 
-    std::vector<MoveByte>& getSolutionPath() {
+    std::vector<MoveByte> getSolutionPath() {
         return m_solutionPath;
     }
 
@@ -60,6 +60,7 @@ protected:
     SearchResult backtrack(const std::chrono::time_point<std::chrono::system_clock>& startTime, std::chrono::milliseconds& timeout) {
         std::chrono::time_point<std::chrono::system_clock> now = std::chrono::system_clock::now();
         if (std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime) > timeout) {
+			m_solutionPath.clear();
             return SearchResult::TIMEOUT;
         }
         
