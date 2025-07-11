@@ -6,6 +6,7 @@
 #include <SFML/System.hpp>
 //#include "Solver.cpp"
 #include <iostream>
+#include <map>
 #include <chrono>
 #include "Solver.cpp"
 
@@ -33,35 +34,36 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 			// Change board representation
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::A) {
-					gameLogic.setBoardType(BoardType::English);
+					gameLogic.setBoard(std::make_unique<EnglishBoard>());
+					//gameLogic.setBoardType(BoardType::English);
 					gameLogic.resetGame();
 					ui.resetFieldToShape();
 				}
 			}
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::S) {
-					gameLogic.setBoardType(BoardType::European);
+					gameLogic.setBoard(std::make_unique<EuropeanBoard>());
 					gameLogic.resetGame();
 					ui.resetFieldToShape();
 				}
 			}
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::D) {
-					gameLogic.setBoardType(BoardType::SmallDiamond);
+					gameLogic.setBoard(std::make_unique<SmallDiamondBoard>());
 					gameLogic.resetGame();
 					ui.resetFieldToShape();
 				}
 			}
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::F) {
-					gameLogic.setBoardType(BoardType::Asymmetric);
+					gameLogic.setBoard(std::make_unique<AsymmetricBoard>());
 					gameLogic.resetGame();
 					ui.resetFieldToShape();
 				}
 			}
 			if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
 				if (keyPressed->code == sf::Keyboard::Key::G) {
-					gameLogic.setBoardType(BoardType::ArrowUp);
+					gameLogic.setBoard(std::make_unique<ArrowUpBoard>());
 					gameLogic.resetGame();
 					ui.resetFieldToShape();
 				}
@@ -78,8 +80,13 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							std::chrono::milliseconds timeout(25000);
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 							if (solver.solve(startTime, timeout, true)) {
+								
 								std::vector<MoveByte>& moves = solver.getSolutionPath();
-								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+								std::cout << "Test";
+								//std::map<std::pair<int, int>, uint8_t> gridIdxMap = gameLogic.getGridToIndexMap();
+								std::cout << "Test";
+								ui.highlightHint(moves[0], gameLogic.getGridToIndexMap()); // moves[0] contains the next move of the solution found
+								std::cout << "Test";
 							}
 							break;
 						}
@@ -91,7 +98,8 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 							if (solver.solve(startTime, timeout, true)) {
 								std::vector<MoveByte>& moves = solver.getSolutionPath();
-								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+								std::map<std::pair<int, int>, uint8_t> gridIdxMap = gameLogic.getGridToIndexMap();
+								ui.highlightHint(moves[0], gridIdxMap); // moves[0] contains the next move of the solution found
 							}
 							break;
 						}
@@ -103,7 +111,8 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 							if (solver.solve(startTime, timeout, true)) {
 								std::vector<MoveByte>& moves = solver.getSolutionPath();
-								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+								std::map<std::pair<int, int>, uint8_t> gridIdxMap = gameLogic.getGridToIndexMap();
+								ui.highlightHint(moves[0], gridIdxMap); // moves[0] contains the next move of the solution found
 							}
 							break;
 						}
@@ -115,7 +124,8 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 							const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 							if (solver.solve(startTime, timeout, true)) {
 								std::vector<MoveByte>& moves = solver.getSolutionPath();
-								ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+								std::map<std::pair<int, int>, uint8_t> gridIdxMap = gameLogic.getGridToIndexMap();
+								ui.highlightHint(moves[0], gridIdxMap); // moves[0] contains the next move of the solution found
 							}
 							break;
 						}
@@ -127,7 +137,8 @@ static void handleEvents(sf::RenderWindow& window, GameLogic& gameLogic, UserInt
 						const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
 						if (solver.solve(startTime, timeout, true)) {
 							std::vector<MoveByte>& moves = solver.getSolutionPath();
-							ui.highlightHint(moves[0]); // moves[0] contains the next move of the solution found
+							std::map<std::pair<int, int>, uint8_t> gridIdxMap = gameLogic.getGridToIndexMap();
+							ui.highlightHint(moves[0], gridIdxMap); // moves[0] contains the next move of the solution found
 						}
 						break;
 					}
