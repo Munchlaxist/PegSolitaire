@@ -175,4 +175,5 @@ uint64_t GameLogic::convertBoardFormat() {
 void GameLogic::resetGame() {
 	m_gameState = GameState::Playing; // Reset the game state to playing
 	m_moveHistory = std::stack<MovePair>(); // Reset the move history for the new game
+	m_board->initializeBoard(); // Reinitialize the board to its starting state
 }
