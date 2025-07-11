@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include "UserInterface.h"
 #include "Move.h"
+#include <map>
 
 
 UserInterface::UserInterface(GameLogic& gameLogic) : m_gameLogic{ gameLogic } {
@@ -145,7 +146,22 @@ void UserInterface::drawGameWonText() {
 	m_window.draw(gameWonText);
 }
 
-void UserInterface::highlightHint(MoveByte& move) {
+void UserInterface::highlightHint(MoveByte& move, const std::map<std::pair<int, int>, uint8_t>& gridToIndexMap) {
+	for (Field& field : m_gameLogic.getBoard()) {
+		std::cout << "Field position: " << field.getPosition().first << ", " << field.getPosition().second << std::endl;
+		uint8_t t = gridToIndexMap.at(field.getPosition());
+		std::cout << "Grid index: " << static_cast<int>(t) << std::endl;
+		if (gridToIndexMap.at(field.getPosition()) == move.from) {
+			m_fieldToShape[&field].setFillColor(sf::Color::Yellow); // Highlight the field from which the move is made
+		}
+		if (gridToIndexMap.at(field.getPosition()) == move.to) {
+			m_fieldToShape[&field].setOutlineColor(sf::Color::Yellow); // Highlight the field to which the move is made
+		}
+	}
+}
+
+/*
+void UserInterface::highlightHint(MoveByte& move, std::map<std::pair<int, int>, uint8_t>& gridToIndexMap) {
 	switch (m_gameLogic.getBoardType()) {
 	case BoardType::English:
 	case BoardType::ArrowUp:
@@ -191,7 +207,7 @@ void UserInterface::highlightHint(MoveByte& move) {
 		break;
 	}
 }
-
+*/
 void UserInterface::render() {
 	m_window.clear();
 	drawBackground("assets/images/white_oak_bg.png");

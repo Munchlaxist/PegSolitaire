@@ -83,7 +83,7 @@ public:
 	/**
 		Highlights the next possible move to find a valid solution.
 	*/
-	void highlightHint(MoveByte& move);
+	void highlightHint(MoveByte& move, const std::map<std::pair<int, int>, uint8_t>& gridToIndexMap);
 
 	/**
 		Clears, draws and displays the game window for the next frame.
