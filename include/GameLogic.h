@@ -6,6 +6,8 @@
 #include "Field.h"
 #include <stack>
 #include "Move.h"
+#include "Board.cpp"
+#include <memory>
 
 /**
 	Describes the possible states of the game.
@@ -19,102 +21,17 @@ enum class GameState {
 	GameLost,
 };
 
-enum class BoardType {
-	English,		// Standard English Peg Solitaire board
-	European,		// European variant of the Peg Solitaire board
-	Asymmetric,		// Diamond-shaped Peg Solitaire board
-	SmallDiamond,	// Small Diamond-shaped Peg Solitaire board
-	ArrowUp,		// Arrow Up-shaped Peg Solitaire board
-};
-
 /**
 	Implementation of the game logic for the Peg Solitaire game.
 */
 class GameLogic {
 private:
-	BoardType m_boardType{BoardType::English};
-	std::vector<Field> m_board{}; // Represents the board (33 fields in total in english, 37 in european, 32 in diamond, 39 in asymmetric) with 7x7-grid positions
+	//BoardType m_boardType{BoardType::English};
+	std::unique_ptr<Board> m_board; // Represents the board (33 fields in total in english, 37 in european, 32 in diamond, 39 in asymmetric) with 7x7-grid positions
 	std::stack<MovePair> m_moveHistory{}; // Stack to keep track of moves made during the game for undo functionality
 	GameState m_gameState{ GameState::Playing }; // Current state of the game
 
-	static constexpr std::array<std::array<int, 7>, 7> defaultBoardEnglish{ {
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{ 1,  1,  1,  0,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	} }; // Describes the initial state of the board when represented as a 7x7 grid
-	static constexpr std::array<std::array<int, 7>, 7> defaultBoardEuropean{ {
-	{-1, -1,  0,  1,  1, -1, -1},
-	{-1,  1,  1,  1,  1,  1, -1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{-1,  1,  1,  1,  1,  1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	} };
-	static constexpr std::array<std::array<int, 8>, 8> defaultBoardAsymmetric{ {
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	{ 1,  1,  1,  1,  1,  1,  1,  1},
-	{ 1,  1,  1,  0,  1,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1,  1},
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	} };
-	static constexpr std::array<std::array<int, 7>, 8> defaultBoardSmallDiamond{ {
-	{-1, -1, -1,  1, -1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1,  1,  1,  1,  1,  1, -1},
-	{ 1,  1,  1,  0,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{-1,  1,  1,  1,  1,  1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1, -1, -1,  1, -1, -1, -1},
-	} };
-	static constexpr std::array<std::array<int, 7>, 7> defaultBoardArrowUp{ {
-	{-1, -1,  0,  1,  0, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{ 0,  1,  1,  1,  1,  1,  0},
-	{ 0,  0,  0,  1,  0,  0,  0},
-	{ 0,  0,  0,  1,  0,  0,  0},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	} }; // Describes the initial state of the board when represented as a 7x7 grid
-
-	/**
-		Initializes the board based on the english variant of peg solitaire.
-	*/
-	void initializeEnglishBoard();
-
-	/**
-		Initializes the board based on the european variant of peg solitaire.
-	*/
-	void initializeEuropeanBoard();
-
-	/**
-		Initializes the board based on the small diamond variant of peg solitaire.
-	*/
-	void initializeSmallDiamondBoard();
-
-	/**
-		Initializes the board based on the asymmetric variant of peg solitaire.
-	*/
-	void initializeAsymmetricBoard();
-
-	/**
-		Initializes the board based on the arrow up variant of peg solitaire.
-	*/
-	void initializeArrowUpBoard();
-
 public:
-	static const std::map<std::pair<int, int>, uint8_t> englishGridIdxMap;
-	static const std::map<std::pair<int, int>, uint8_t> europeanGridIdxMap;
-	static const std::map<std::pair<int, int>, uint8_t> asymmetricGridIdxMap;
-	static const std::map<std::pair<int, int>, uint8_t> smallDiamondGridIdxMap;
 	/**
 		Constructor for the GameLogic class, where the board is initialized with the default board state.
 	*/
@@ -125,6 +42,9 @@ public:
 		\return A reference to the array representing the board as fields
 	*/
 	std::vector<Field>& getBoard();
+
+	void setBoard(std::unique_ptr<Board> board);
+
 
 	/**
 		Gets the current move history of the game.
@@ -144,17 +64,13 @@ public:
 	*/
 	BoardType& getBoardType();
 
+	const std::map<std::pair<int, int>, uint8_t>& getGridToIndexMap();
+
 	/**
 		Sets the current state of the game.
 		\param state The new game state to set
 	*/
 	void setGameState(GameState state);
-
-	/**
-		Sets the board type for the game.
-		\param type The new board type to set
-	*/
-	void setBoardType(BoardType type);
 
 	/**
 		Gets the field at a specific position on the board.

@@ -8,69 +8,18 @@
 #include "Move.h"
 
 
-GameLogic::GameLogic() {
-	// Initialize the game logic with the default board state
-	for (std::size_t row = 0; row < 7; ++row) {
-		for (std::size_t col = 0; col < 7; ++col) {
-			if (defaultBoardEnglish[row][col] == 1) {
-				Field field{ FieldState::Occupied, std::make_pair(row, col) };
-				m_board.push_back(field);
-			}
-			else if (defaultBoardEnglish[row][col] == 0) {
-				Field field{ FieldState::Empty, std::make_pair(row, col) };
-				m_board.push_back(field);
-			}
-			else {
-				continue; // Skip invalid fields
-			}
-		}
-	}
-}
-
-const std::map<std::pair<int, int>, uint8_t> GameLogic::englishGridIdxMap = {
-	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
-	{std::make_pair(1,2), 3}, {std::make_pair(1,3), 4}, {std::make_pair(1,4), 5},
-	{std::make_pair(2,0), 6}, {std::make_pair(2,1), 7}, {std::make_pair(2,2), 8}, {std::make_pair(2,3), 9}, {std::make_pair(2,4), 10}, {std::make_pair(2,5), 11}, {std::make_pair(2,6), 12},
-	{std::make_pair(3,0), 13}, {std::make_pair(3,1), 14}, {std::make_pair(3,2), 15}, {std::make_pair(3,3), 16}, {std::make_pair(3,4), 17}, {std::make_pair(3,5), 18}, {std::make_pair(3,6), 19},
-	{std::make_pair(4,0), 20}, {std::make_pair(4,1), 21}, {std::make_pair(4,2), 22}, {std::make_pair(4,3), 23}, {std::make_pair(4,4), 24}, {std::make_pair(4,5), 25}, {std::make_pair(4,6), 26},
-	{std::make_pair(5,2), 27}, {std::make_pair(5,3), 28}, {std::make_pair(5,4), 29},
-	{std::make_pair(6,2), 30}, {std::make_pair(6,3), 31}, {std::make_pair(6,4), 32},
-};
-
-const std::map<std::pair<int, int>, uint8_t> GameLogic::europeanGridIdxMap = {
-	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
-	{std::make_pair(1,1), 3}, {std::make_pair(1,2), 4}, {std::make_pair(1,3), 5}, {std::make_pair(1,4), 6}, {std::make_pair(1,5), 7},
-	{std::make_pair(2,0), 8}, {std::make_pair(2,1), 9}, {std::make_pair(2,2), 10}, {std::make_pair(2,3), 11}, {std::make_pair(2,4), 12}, {std::make_pair(2,5), 13}, {std::make_pair(2,6), 14},
-	{std::make_pair(3,0), 15}, {std::make_pair(3,1), 16}, {std::make_pair(3,2), 17}, {std::make_pair(3,3), 18}, {std::make_pair(3,4), 19}, {std::make_pair(3,5), 20}, {std::make_pair(3,6), 21},
-	{std::make_pair(4,0), 22}, {std::make_pair(4,1), 23}, {std::make_pair(4,2), 24}, {std::make_pair(4,3), 25}, {std::make_pair(4,4), 26}, {std::make_pair(4,5), 27}, {std::make_pair(4,6), 28},
-	{std::make_pair(5,1), 29}, {std::make_pair(5,2), 30}, {std::make_pair(5,3), 31}, {std::make_pair(5,4), 32}, {std::make_pair(5,5), 33},
-	{std::make_pair(6,2), 34}, {std::make_pair(6,3), 35}, {std::make_pair(6,4), 36},
-};
-
-const std::map<std::pair<int, int>, uint8_t> GameLogic::asymmetricGridIdxMap = {
-	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
-	{std::make_pair(1,2), 3}, {std::make_pair(1,3), 4}, {std::make_pair(1,4), 5},
-	{std::make_pair(2,2), 6}, {std::make_pair(2,3), 7}, {std::make_pair(2,4), 8},
-	{std::make_pair(3,0), 9}, {std::make_pair(3,1), 10}, {std::make_pair(3,2), 11}, {std::make_pair(3,3), 12}, {std::make_pair(3,4), 13}, {std::make_pair(3,5), 14}, {std::make_pair(3,6), 15}, {std::make_pair(3,7), 16},
-	{std::make_pair(4,0), 17}, {std::make_pair(4,1), 18}, {std::make_pair(4,2), 19}, {std::make_pair(4,3), 20}, {std::make_pair(4,4), 21}, {std::make_pair(4,5), 22}, {std::make_pair(4,6), 23}, {std::make_pair(4,7), 24},
-	{std::make_pair(5,0), 25}, {std::make_pair(5,1), 26}, {std::make_pair(5,2), 27}, {std::make_pair(5,3), 28}, {std::make_pair(5,4), 29}, {std::make_pair(5,5), 30}, {std::make_pair(5,6), 31}, {std::make_pair(5,7), 32},
-	{std::make_pair(6,2), 33}, {std::make_pair(6,3), 34}, {std::make_pair(6,4), 35},
-	{std::make_pair(7,2), 36}, {std::make_pair(7,3), 37}, {std::make_pair(7,4), 38},
-};
-
-const std::map<std::pair<int, int>, uint8_t> GameLogic::smallDiamondGridIdxMap = {
-	{std::make_pair(0,3), 0},
-	{std::make_pair(1,2), 1}, {std::make_pair(1,3), 2}, {std::make_pair(1,4), 3},
-	{std::make_pair(2,1), 4}, {std::make_pair(2,2), 5}, {std::make_pair(2,3), 6}, {std::make_pair(2,4), 7}, {std::make_pair(2,5), 8},
-	{std::make_pair(3,0), 9}, {std::make_pair(3,1), 10}, {std::make_pair(3,2), 11}, {std::make_pair(3,3), 12}, {std::make_pair(3,4), 13}, {std::make_pair(3,5), 14}, {std::make_pair(3,6), 15},
-	{std::make_pair(4,0), 16}, {std::make_pair(4,1), 17}, {std::make_pair(4,2), 18}, {std::make_pair(4,3), 19}, {std::make_pair(4,4), 20}, {std::make_pair(4,5), 21}, {std::make_pair(4,6), 22},
-	{std::make_pair(5,1), 23}, {std::make_pair(5,2), 24}, {std::make_pair(5,3), 25}, {std::make_pair(5,4), 26}, {std::make_pair(5,5), 27},
-	{std::make_pair(6,2), 28}, {std::make_pair(6,3), 29}, {std::make_pair(6,4), 30},
-	{std::make_pair(7,3), 31},
-};
+GameLogic::GameLogic() : m_board{ std::make_unique<EnglishBoard>()} {}
 
 std::vector<Field>& GameLogic::getBoard() {
-	return m_board;
+	return m_board->getBoardRepresentation();
+}
+
+void GameLogic::setBoard(std::unique_ptr<Board> board) {
+	m_board = std::move(board);
+}
+
+const std::map<std::pair<int, int>, uint8_t>& GameLogic::getGridToIndexMap() {
+	return m_board->getGridToIndexMap();
 }
 
 std::stack<MovePair>& GameLogic::getMoveHistory() {
@@ -86,99 +35,11 @@ void GameLogic::setGameState(GameState state) {
 }
 
 BoardType& GameLogic::getBoardType() {
-	return m_boardType;
-}
-
-void GameLogic::setBoardType(BoardType type) {
-	m_boardType = type;
-}
-
-void GameLogic::initializeEnglishBoard() {
-	for (std::size_t row = 0; row < 7; ++row) {
-		for (std::size_t col = 0; col < 7; ++col) {
-			if (defaultBoardEnglish[row][col] == 1) {
-				Field field{ FieldState::Occupied, std::make_pair(row, col) };
-				m_board.push_back(field);
-			}
-			else if (defaultBoardEnglish[row][col] == 0) {
-				Field field{ FieldState::Empty, std::make_pair(row, col) };
-				m_board.push_back(field);
-			}
-			else {
-				continue; // Skip invalid fields
-			}
-		}
-	}
-}
-
-void GameLogic::initializeEuropeanBoard() {
-	for (std::size_t row = 0; row < 7; ++row) {
-		for (std::size_t col = 0; col < 7; ++col) {
-			if (defaultBoardEuropean[row][col] == 1) {
-				m_board.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
-			}
-			else if (defaultBoardEuropean[row][col] == 0) {
-				m_board.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
-			}
-			else {
-				continue; // Skip invalid fields
-			}
-		}
-	}
-}
-
-void GameLogic::initializeSmallDiamondBoard() {
-	for (std::size_t row = 0; row < 8; ++row) {
-		for (std::size_t col = 0; col < 7; ++col) {
-			if (defaultBoardSmallDiamond[row][col] == 1) {
-				m_board.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
-			}
-			else if (defaultBoardSmallDiamond[row][col] == 0) {
-				m_board.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
-			}
-			else {
-				continue; // Skip invalid fields
-			}
-		}
-	}
-}
-
-void GameLogic::initializeAsymmetricBoard() {
-	for (std::size_t row = 0; row < 8; ++row) {
-		for (std::size_t col = 0; col < 8; ++col) {
-			if (defaultBoardAsymmetric[row][col] == 1) {
-				m_board.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
-			}
-			else if (defaultBoardAsymmetric[row][col] == 0) {
-				m_board.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
-			}
-			else {
-				continue; // Skip invalid fields
-			}
-		}
-	}
-}
-
-void GameLogic::initializeArrowUpBoard() {
-	for (std::size_t row = 0; row < 7; ++row) {
-		for (std::size_t col = 0; col < 7; ++col) {
-			if (defaultBoardArrowUp[row][col] == 1) {
-				Field field{ FieldState::Occupied, std::make_pair(row, col) };
-				m_board.push_back(field);
-			}
-			else if (defaultBoardArrowUp[row][col] == 0) {
-				Field field{ FieldState::Empty, std::make_pair(row, col) };
-				m_board.push_back(field);
-			}
-			else {
-				continue; // Skip invalid fields
-			}
-		}
-	}
+	return m_board->getBoardType();
 }
 
 Field& GameLogic::getField(std::pair<int, int> position) {
-	for (Field& field : m_board) {
+	for (Field& field : getBoard()) {
 		if (field.getPosition() == position) {
 			return field;
 		}
@@ -279,9 +140,9 @@ void GameLogic::undoMove() {
 }
 
 bool GameLogic::movesAvailable() {
-	for (Field& selectedField : m_board) {
+	for (Field& selectedField : getBoard()) {
 		if (selectedField.getState() == FieldState::Occupied) {
-			for (Field& field : m_board) {
+			for (Field& field : getBoard()) {
 				if (field.getState() == FieldState::Empty) {
 					if (isValidMove(selectedField, field)) {
 						return true;
@@ -294,41 +155,14 @@ bool GameLogic::movesAvailable() {
 }
 
 bool GameLogic::solutionFound() {
-	switch (m_boardType) {
-	case BoardType::English:
-	case BoardType::SmallDiamond:
-	case BoardType::ArrowUp:
-		for (Field& field : m_board) {
-			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(3, 3)) {
-				return false; // If any field is still occupied besides the one in the center, the solution is not found
-			}
-		}
-		break;
-	case BoardType::European:
-		for (Field& field : m_board) {
-			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(6, 4)) {
-				return false; // If any field is still occupied besides the one in the bottom right corner, the solution is not found
-			}
-		}
-		break;
-	case BoardType::Asymmetric:
-		for (Field& field : m_board) {
-			if (field.getState() == FieldState::Occupied && field.getPosition() != std::pair<int, int>(4, 3)) {
-				return false; // If any field is still occupied besides the one in the center, the solution is not found
-			}
-		}
-		break;
-	default:
-		break;
-	}
-	return true;
+	return m_board->solutionFound();
 }
 
 uint64_t GameLogic::convertBoardFormat() {
 	uint64_t solverBoard { 0 };
 	int exponent = 0;
 	
-	for (Field& field : m_board) {
+	for (Field& field : getBoard()) {
 		std::pair<int, int> position = field.getPosition();
 		if (field.getState() == FieldState::Occupied || field.getState() == FieldState::Selected) {
 			solverBoard += static_cast<uint64_t>(std::pow(2, exponent));
@@ -341,25 +175,5 @@ uint64_t GameLogic::convertBoardFormat() {
 void GameLogic::resetGame() {
 	m_gameState = GameState::Playing; // Reset the game state to playing
 	m_moveHistory = std::stack<MovePair>(); // Reset the move history for the new game
-	m_board.clear();
-
-	switch (m_boardType) {
-	case BoardType::English:
-		initializeEnglishBoard();
-		break;
-	case BoardType::European:
-		initializeEuropeanBoard();
-		break;
-	case BoardType::Asymmetric:
-		initializeAsymmetricBoard();
-		break;
-	case BoardType::SmallDiamond:
-		initializeSmallDiamondBoard();
-		break;
-	case BoardType::ArrowUp:
-		initializeArrowUpBoard();
-		break;
-	default:
-		break;
-	}
+	//m_board->initializeBoard();
 }
