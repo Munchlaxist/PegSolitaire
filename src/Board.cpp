@@ -1,87 +1,66 @@
 #include <vector>
 #include <array>
 #include <map>
+#include <chrono>
 #include <utility>
 #include "Field.h"
-
-
-enum class BoardType {
-	English,		// Standard English Peg Solitaire board
-	European,		// European variant of the Peg Solitaire board
-	Asymmetric,		// Diamond-shaped Peg Solitaire board
-	SmallDiamond,	// Small Diamond-shaped Peg Solitaire board
-	ArrowUp,		// Arrow Up-shaped Peg Solitaire board
-};
+#include "Move.h"
+#include "Solver.cpp"
 
 
 class Board {
 protected:
-	std::vector<Field> m_boardRepresentation{}; // 64-bit integer representing the board state
-	BoardType m_boardType{}; // Type of the board
-	const std::map<std::pair<int, int>, uint8_t> gridToIndexMap;
+	std::vector<Field> m_boardRepresentation;
+	std::map<uint8_t, std::pair<int, int>> m_idxToGridMap;
+	uint64_t m_defaultBoard{};
 
 public:
-	Board() = default;
+	virtual ~Board() = default; // Virtual destructor for proper cleanup of derived classes
 
 	std::vector<Field>& getBoardRepresentation() {
 		return m_boardRepresentation;
 	}
-	BoardType& getBoardType() {
-		return m_boardType;
+
+	std::map<uint8_t, std::pair<int, int>>& getGridToIndexMap() {
+		return m_idxToGridMap;
 	}
-	virtual void initializeBoard() = 0; // Pure virtual function to initialize the board
+
+	virtual void initializeBoard() = 0;
 	virtual bool solutionFound() = 0;
-	const std::map<std::pair<int, int>, uint8_t>& getGridToIndexMap() {
-		return gridToIndexMap;
-	}
+	virtual std::vector<MoveByte> getNextHint(uint64_t boardState) = 0;
 };
 
 
 class EnglishBoard : public Board {
-private:
-	static constexpr std::array<std::array<int, 7>, 7> defaultBoard{ {
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{ 1,  1,  1,  0,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	} }; // Describes the initial state of the board when represented as a 7x7 grid
-
-	const std::map<std::pair<int, int>, uint8_t> gridToIndexMap{ {
-	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
-	{std::make_pair(1,2), 3}, {std::make_pair(1,3), 4}, {std::make_pair(1,4), 5},
-	{std::make_pair(2,0), 6}, {std::make_pair(2,1), 7}, {std::make_pair(2,2), 8}, {std::make_pair(2,3), 9}, {std::make_pair(2,4), 10}, {std::make_pair(2,5), 11}, {std::make_pair(2,6), 12},
-	{std::make_pair(3,0), 13}, {std::make_pair(3,1), 14}, {std::make_pair(3,2), 15}, {std::make_pair(3,3), 16}, {std::make_pair(3,4), 17}, {std::make_pair(3,5), 18}, {std::make_pair(3,6), 19},
-	{std::make_pair(4,0), 20}, {std::make_pair(4,1), 21}, {std::make_pair(4,2), 22}, {std::make_pair(4,3), 23}, {std::make_pair(4,4), 24}, {std::make_pair(4,5), 25}, {std::make_pair(4,6), 26},
-	{std::make_pair(5,2), 27}, {std::make_pair(5,3), 28}, {std::make_pair(5,4), 29},
-	{std::make_pair(6,2), 30}, {std::make_pair(6,3), 31}, {std::make_pair(6,4), 32},
-	} };
-
 public:
 	void initializeBoard() override {
 		m_boardRepresentation.clear();
-		for (std::size_t row = 0; row < 7; ++row) {
-			for (std::size_t col = 0; col < 7; ++col) {
-				if (defaultBoard[row][col] == 1) {
-					Field field{ FieldState::Occupied, std::make_pair(row, col) };
-					m_boardRepresentation.push_back(field);
-				}
-				else if (defaultBoard[row][col] == 0) {
-					Field field{ FieldState::Empty, std::make_pair(row, col) };
-					m_boardRepresentation.push_back(field);
-				}
-				else {
-					continue; // Skip invalid fields
-				}
+		bool set;
+		for (unsigned char idx{ 0 }; idx < 33; ++idx) {
+			set = (m_defaultBoard >> idx) & 1;
+			if (set) {
+				// If the bit is set, the field is occupied
+				m_boardRepresentation.push_back(Field{ FieldState::Occupied, m_idxToGridMap.at(idx) });
+			}
+			else {
+				// If the bit is not set, the field is empty
+				m_boardRepresentation.push_back(Field{ FieldState::Empty, m_idxToGridMap.at(idx) });
 			}
 		}
 	}
 
-	EnglishBoard() : Board() {
+	EnglishBoard() {
 		// Initialize the English board representation
-		m_boardType = BoardType::English;
+		m_defaultBoard = 0x1FFFEFFFF;
+		m_idxToGridMap = {
+		{0, std::make_pair(0,2)}, {1, std::make_pair(0,3)}, {2, std::make_pair(0,4)},
+		{3, std::make_pair(1,2)}, {4, std::make_pair(1,3)}, {5, std::make_pair(1,4)},
+		{6, std::make_pair(2,0)}, {7, std::make_pair(2,1)}, {8, std::make_pair(2,2)}, {9, std::make_pair(2,3)}, {10, std::make_pair(2,4)}, {11, std::make_pair(2,5)}, {12, std::make_pair(2,6)},
+		{13, std::make_pair(3,0)}, {14, std::make_pair(3,1)}, {15, std::make_pair(3,2)}, {16, std::make_pair(3,3)}, {17, std::make_pair(3,4)}, {18, std::make_pair(3,5)}, {19, std::make_pair(3,6)},
+		{20, std::make_pair(4,0)}, {21, std::make_pair(4,1)}, {22, std::make_pair(4,2)}, {23, std::make_pair(4,3)}, {24, std::make_pair(4,4)}, {25, std::make_pair(4,5)}, {26, std::make_pair(4,6)},
+		{27, std::make_pair(5,2)}, {28, std::make_pair(5,3)}, {29, std::make_pair(5,4)},
+		{30, std::make_pair(6,2)}, {31, std::make_pair(6,3)}, {32, std::make_pair(6,4)},
+		};
 		m_boardRepresentation.resize(33);
 		initializeBoard();
 	}
@@ -95,51 +74,45 @@ public:
 		return true;
 	}
 
+	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
+		EnglishBoardSolver solver(boardState);
+		std::chrono::milliseconds timeout(25000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+		solver.solve(startTime, timeout, true);
+		return solver.getSolutionPath();
+	}
 };
 
 class EuropeanBoard : public Board {
-private:
-	static constexpr std::array<std::array<int, 7>, 7> defaultBoard{ {
-	{-1, -1,  0,  1,  1, -1, -1},
-	{-1,  1,  1,  1,  1,  1, -1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{-1,  1,  1,  1,  1,  1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	} };
-
-	const std::map<std::pair<int, int>, uint8_t> gridToIndexMap = {
-	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
-	{std::make_pair(1,1), 3}, {std::make_pair(1,2), 4}, {std::make_pair(1,3), 5}, {std::make_pair(1,4), 6}, {std::make_pair(1,5), 7},
-	{std::make_pair(2,0), 8}, {std::make_pair(2,1), 9}, {std::make_pair(2,2), 10}, {std::make_pair(2,3), 11}, {std::make_pair(2,4), 12}, {std::make_pair(2,5), 13}, {std::make_pair(2,6), 14},
-	{std::make_pair(3,0), 15}, {std::make_pair(3,1), 16}, {std::make_pair(3,2), 17}, {std::make_pair(3,3), 18}, {std::make_pair(3,4), 19}, {std::make_pair(3,5), 20}, {std::make_pair(3,6), 21},
-	{std::make_pair(4,0), 22}, {std::make_pair(4,1), 23}, {std::make_pair(4,2), 24}, {std::make_pair(4,3), 25}, {std::make_pair(4,4), 26}, {std::make_pair(4,5), 27}, {std::make_pair(4,6), 28},
-	{std::make_pair(5,1), 29}, {std::make_pair(5,2), 30}, {std::make_pair(5,3), 31}, {std::make_pair(5,4), 32}, {std::make_pair(5,5), 33},
-	{std::make_pair(6,2), 34}, {std::make_pair(6,3), 35}, {std::make_pair(6,4), 36},
-	};
-
 public:
 	void initializeBoard() override {
 		m_boardRepresentation.clear();
-		for (std::size_t row = 0; row < 7; ++row) {
-			for (std::size_t col = 0; col < 7; ++col) {
-				if (defaultBoard[row][col] == 1) {
-					m_boardRepresentation.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
-				}
-				else if (defaultBoard[row][col] == 0) {
-					m_boardRepresentation.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
-				}
-				else {
-					continue; // Skip invalid fields
-				}
+		bool set;
+		for (unsigned char idx{ 0 }; idx < 37; ++idx) {
+			set = (m_defaultBoard >> idx) & 1;
+			if (set) {
+				// If the bit is set, the field is occupied
+				m_boardRepresentation.push_back(Field{ FieldState::Occupied, m_idxToGridMap.at(idx) });
+			}
+			else {
+				// If the bit is not set, the field is empty
+				m_boardRepresentation.push_back(Field{ FieldState::Empty, m_idxToGridMap.at(idx) });
 			}
 		}
 	}
 
 	EuropeanBoard() {
-		// Initialize the English board representation
-		m_boardType = BoardType::European;
+		// Initialize the European board representation
+		m_defaultBoard = 0x1FFFFFFFFE;
+		m_idxToGridMap = {
+		{0, std::make_pair(0,2)}, {1, std::make_pair(0,3)}, {2, std::make_pair(0,4)},
+		{3, std::make_pair(1,1)}, {4, std::make_pair(1,2)}, {5, std::make_pair(1,3)}, {6, std::make_pair(1,4)}, {7, std::make_pair(1,5)},
+		{8, std::make_pair(2,0)}, {9, std::make_pair(2,1)}, {10, std::make_pair(2,2)}, {11, std::make_pair(2,3)}, {12, std::make_pair(2,4)}, {13, std::make_pair(2,5)}, {14, std::make_pair(2,6)},
+		{15, std::make_pair(3,0)}, {16, std::make_pair(3,1)}, {17, std::make_pair(3,2)}, {18, std::make_pair(3,3)}, {19, std::make_pair(3,4)}, {20, std::make_pair(3,5)}, {21, std::make_pair(3,6)},
+		{22, std::make_pair(4,0)}, {23, std::make_pair(4,1)}, {24, std::make_pair(4,2)}, {25, std::make_pair(4,3)}, {26, std::make_pair(4,4)}, {27, std::make_pair(4,5)}, {28, std::make_pair(4,6)},
+		{29, std::make_pair(5,1)}, {30, std::make_pair(5,2)}, {31, std::make_pair(5,3)}, {32, std::make_pair(5,4)}, {33, std::make_pair(5,5)},
+		{34, std::make_pair(6,2)}, {35, std::make_pair(6,3)}, {36, std::make_pair(6,4)},
+		};
 		m_boardRepresentation.resize(37);
 		initializeBoard();
 	}
@@ -152,53 +125,47 @@ public:
 		}
 		return true;
 	}
+
+	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
+		EuropeanBoardSolver solver(boardState);
+		std::chrono::milliseconds timeout(50000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+		solver.solve(startTime, timeout, true);
+		return solver.getSolutionPath();
+	}
 };
 
 class AsymmetricBoard : public Board {
-private:
-	static constexpr std::array<std::array<int, 8>, 8> defaultBoard{ {
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	{ 1,  1,  1,  1,  1,  1,  1,  1},
-	{ 1,  1,  1,  0,  1,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1,  1},
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1, -1},
-	} };
-
-	const std::map<std::pair<int, int>, uint8_t> gridToIndexMap = {
-	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
-	{std::make_pair(1,2), 3}, {std::make_pair(1,3), 4}, {std::make_pair(1,4), 5},
-	{std::make_pair(2,2), 6}, {std::make_pair(2,3), 7}, {std::make_pair(2,4), 8},
-	{std::make_pair(3,0), 9}, {std::make_pair(3,1), 10}, {std::make_pair(3,2), 11}, {std::make_pair(3,3), 12}, {std::make_pair(3,4), 13}, {std::make_pair(3,5), 14}, {std::make_pair(3,6), 15}, {std::make_pair(3,7), 16},
-	{std::make_pair(4,0), 17}, {std::make_pair(4,1), 18}, {std::make_pair(4,2), 19}, {std::make_pair(4,3), 20}, {std::make_pair(4,4), 21}, {std::make_pair(4,5), 22}, {std::make_pair(4,6), 23}, {std::make_pair(4,7), 24},
-	{std::make_pair(5,0), 25}, {std::make_pair(5,1), 26}, {std::make_pair(5,2), 27}, {std::make_pair(5,3), 28}, {std::make_pair(5,4), 29}, {std::make_pair(5,5), 30}, {std::make_pair(5,6), 31}, {std::make_pair(5,7), 32},
-	{std::make_pair(6,2), 33}, {std::make_pair(6,3), 34}, {std::make_pair(6,4), 35},
-	{std::make_pair(7,2), 36}, {std::make_pair(7,3), 37}, {std::make_pair(7,4), 38},
-	};
-
 public:
 	void initializeBoard() override {
 		m_boardRepresentation.clear();
-		for (std::size_t row = 0; row < 8; ++row) {
-			for (std::size_t col = 0; col < 8; ++col) {
-				if (defaultBoard[row][col] == 1) {
-					m_boardRepresentation.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
-				}
-				else if (defaultBoard[row][col] == 0) {
-					m_boardRepresentation.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
-				}
-				else {
-					continue; // Skip invalid fields
-				}
+		bool set;
+		for (unsigned char idx{ 0 }; idx < 39; ++idx) {
+			set = (m_defaultBoard >> idx) & 1;
+			if (set) {
+				// If the bit is set, the field is occupied
+				m_boardRepresentation.push_back(Field{ FieldState::Occupied, m_idxToGridMap.at(idx) });
+			}
+			else {
+				// If the bit is not set, the field is empty
+				m_boardRepresentation.push_back(Field{ FieldState::Empty, m_idxToGridMap.at(idx) });
 			}
 		}
 	}
 
 	AsymmetricBoard() {
-		// Initialize the English board representation
-		m_boardType = BoardType::Asymmetric;
+		// Initialize the Asymmetric board representation
+		m_defaultBoard = 0x7FFFEFFFFF;
+		m_idxToGridMap = {
+		{0, std::make_pair(0,2)}, {1, std::make_pair(0,3)}, {2, std::make_pair(0,4)},
+		{3, std::make_pair(1,2)}, {4, std::make_pair(1,3)}, {5, std::make_pair(1,4)},
+		{6, std::make_pair(2,2)}, {7, std::make_pair(2,3)}, {8, std::make_pair(2,4)},
+		{9, std::make_pair(3,0)}, {10, std::make_pair(3,1)}, {11, std::make_pair(3,2)}, {12, std::make_pair(3,3)}, {13, std::make_pair(3,4)}, {14, std::make_pair(3,5)}, {15, std::make_pair(3,6)}, {16, std::make_pair(3,7)},
+		{17, std::make_pair(4,0)}, {18, std::make_pair(4,1)}, {19, std::make_pair(4,2)}, {20, std::make_pair(4,3)}, {21, std::make_pair(4,4)}, {22, std::make_pair(4,5)}, {23, std::make_pair(4,6)}, {24, std::make_pair(4,7)},
+		{25, std::make_pair(5,0)}, {26, std::make_pair(5,1)}, {27, std::make_pair(5,2)}, {28, std::make_pair(5,3)}, {29, std::make_pair(5,4)}, {30, std::make_pair(5,5)}, {31, std::make_pair(5,6)}, {32, std::make_pair(5,7)},
+		{33, std::make_pair(6,2)}, {34, std::make_pair(6,3)}, {35, std::make_pair(6,4)},
+		{36, std::make_pair(7,2)}, {37, std::make_pair(7,3)}, {38, std::make_pair(7,4)},
+		};
 		m_boardRepresentation.resize(39);
 		initializeBoard();
 	}
@@ -211,53 +178,47 @@ public:
 		}
 		return true;
 	}
+
+	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
+		AsymmetricBoardSolver solver(boardState);
+		std::chrono::milliseconds timeout(25000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+		solver.solve(startTime, timeout, true);
+		return solver.getSolutionPath();
+	}
 };
 
 class SmallDiamondBoard : public Board {
-private:
-	static constexpr std::array<std::array<int, 7>, 8> defaultBoard{ {
-	{-1, -1, -1,  1, -1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1,  1,  1,  1,  1,  1, -1},
-	{ 1,  1,  1,  0,  1,  1,  1},
-	{ 1,  1,  1,  1,  1,  1,  1},
-	{-1,  1,  1,  1,  1,  1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1, -1, -1,  1, -1, -1, -1},
-	} };
-
-	const std::map<std::pair<int, int>, uint8_t> gridToIndexMap = {
-	{std::make_pair(0,3), 0},
-	{std::make_pair(1,2), 1}, {std::make_pair(1,3), 2}, {std::make_pair(1,4), 3},
-	{std::make_pair(2,1), 4}, {std::make_pair(2,2), 5}, {std::make_pair(2,3), 6}, {std::make_pair(2,4), 7}, {std::make_pair(2,5), 8},
-	{std::make_pair(3,0), 9}, {std::make_pair(3,1), 10}, {std::make_pair(3,2), 11}, {std::make_pair(3,3), 12}, {std::make_pair(3,4), 13}, {std::make_pair(3,5), 14}, {std::make_pair(3,6), 15},
-	{std::make_pair(4,0), 16}, {std::make_pair(4,1), 17}, {std::make_pair(4,2), 18}, {std::make_pair(4,3), 19}, {std::make_pair(4,4), 20}, {std::make_pair(4,5), 21}, {std::make_pair(4,6), 22},
-	{std::make_pair(5,1), 23}, {std::make_pair(5,2), 24}, {std::make_pair(5,3), 25}, {std::make_pair(5,4), 26}, {std::make_pair(5,5), 27},
-	{std::make_pair(6,2), 28}, {std::make_pair(6,3), 29}, {std::make_pair(6,4), 30},
-	{std::make_pair(7,3), 31},
-	};
-
 public:
-	void initializeBoard() {
+	void initializeBoard() override {
 		m_boardRepresentation.clear();
-		for (std::size_t row = 0; row < 8; ++row) {
-			for (std::size_t col = 0; col < 7; ++col) {
-				if (defaultBoard[row][col] == 1) {
-					m_boardRepresentation.push_back(Field{ FieldState::Occupied, std::make_pair(row, col) });
-				}
-				else if (defaultBoard[row][col] == 0) {
-					m_boardRepresentation.push_back(Field{ FieldState::Empty, std::make_pair(row, col) });
-				}
-				else {
-					continue; // Skip invalid fields
-				}
+		bool set;
+		for (unsigned char idx{ 0 }; idx < 32; ++idx) {
+			set = (m_defaultBoard >> idx) & 1;
+			if (set) {
+				// If the bit is set, the field is occupied
+				m_boardRepresentation.push_back(Field{ FieldState::Occupied, m_idxToGridMap.at(idx) });
+			}
+			else {
+				// If the bit is not set, the field is empty
+				m_boardRepresentation.push_back(Field{ FieldState::Empty, m_idxToGridMap.at(idx) });
 			}
 		}
 	}
 
 	SmallDiamondBoard() {
-		// Initialize the English board representation
-		m_boardType = BoardType::SmallDiamond;
+		// Initialize the SmallDiamond board representation
+		m_defaultBoard = 0xFFFFEFFF;
+		m_idxToGridMap = {
+		{0, std::make_pair(0,3)},
+		{1, std::make_pair(1,2)}, {2, std::make_pair(1,3)}, {3, std::make_pair(1,4)},
+		{4, std::make_pair(2,1)}, {5, std::make_pair(2,2)}, {6, std::make_pair(2,3)}, {7, std::make_pair(2,4)}, {8, std::make_pair(2,5)},
+		{9, std::make_pair(3,0)}, {10, std::make_pair(3,1)}, {11, std::make_pair(3,2)}, {12, std::make_pair(3,3)}, {13, std::make_pair(3,4)}, {14, std::make_pair(3,5)}, {15, std::make_pair(3,6)},
+		{16, std::make_pair(4,0)}, {17, std::make_pair(4,1)}, {18, std::make_pair(4,2)}, {19, std::make_pair(4,3)}, {20, std::make_pair(4,4)}, {21, std::make_pair(4,5)}, {22, std::make_pair(4,6)},
+		{23, std::make_pair(5,1)}, {24, std::make_pair(5,2)}, {25, std::make_pair(5,3)}, {26, std::make_pair(5,4)}, {27, std::make_pair(5,5)},
+		{28, std::make_pair(6,2)}, {29, std::make_pair(6,3)}, {30, std::make_pair(6,4)},
+		{31, std::make_pair(7,3)},
+		};
 		m_boardRepresentation.resize(32);
 		initializeBoard();
 	}
@@ -270,54 +231,47 @@ public:
 		}
 		return true;
 	}
+
+	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
+		SmallDiamondBoardSolver solver(boardState);
+		std::chrono::milliseconds timeout(25000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+		solver.solve(startTime, timeout, true);
+		return solver.getSolutionPath();
+	}
 };
 
 class ArrowUpBoard : public Board {
-private:
-	static constexpr std::array<std::array<int, 7>, 7> defaultBoard{ {
-	{-1, -1,  0,  1,  0, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{ 0,  1,  1,  1,  1,  1,  0},
-	{ 0,  0,  0,  1,  0,  0,  0},
-	{ 0,  0,  0,  1,  0,  0,  0},
-	{-1, -1,  1,  1,  1, -1, -1},
-	{-1, -1,  1,  1,  1, -1, -1},
-	} }; // Describes the initial state of the board when represented as a 7x7 grid
-
-	const std::map<std::pair<int, int>, uint8_t> gridToIndexMap = {
-	{std::make_pair(0,2), 0}, {std::make_pair(0,3), 1}, {std::make_pair(0,4), 2},
-	{std::make_pair(1,2), 3}, {std::make_pair(1,3), 4}, {std::make_pair(1,4), 5},
-	{std::make_pair(2,0), 6}, {std::make_pair(2,1), 7}, {std::make_pair(2,2), 8}, {std::make_pair(2,3), 9}, {std::make_pair(2,4), 10}, {std::make_pair(2,5), 11}, {std::make_pair(2,6), 12},
-	{std::make_pair(3,0), 13}, {std::make_pair(3,1), 14}, {std::make_pair(3,2), 15}, {std::make_pair(3,3), 16}, {std::make_pair(3,4), 17}, {std::make_pair(3,5), 18}, {std::make_pair(3,6), 19},
-	{std::make_pair(4,0), 20}, {std::make_pair(4,1), 21}, {std::make_pair(4,2), 22}, {std::make_pair(4,3), 23}, {std::make_pair(4,4), 24}, {std::make_pair(4,5), 25}, {std::make_pair(4,6), 26},
-	{std::make_pair(5,2), 27}, {std::make_pair(5,3), 28}, {std::make_pair(5,4), 29},
-	{std::make_pair(6,2), 30}, {std::make_pair(6,3), 31}, {std::make_pair(6,4), 32},
-	};
-
 public:
-	void initializeBoard() {
+	void initializeBoard() override {
 		m_boardRepresentation.clear();
-		for (std::size_t row = 0; row < 7; ++row) {
-			for (std::size_t col = 0; col < 7; ++col) {
-				if (defaultBoard[row][col] == 1) {
-					Field field{ FieldState::Occupied, std::make_pair(row, col) };
-					m_boardRepresentation.push_back(field);
-				}
-				else if (defaultBoard[row][col] == 0) {
-					Field field{ FieldState::Empty, std::make_pair(row, col) };
-					m_boardRepresentation.push_back(field);
-				}
-				else {
-					continue; // Skip invalid fields
-				}
+		bool set;
+		for (unsigned char idx{ 0 }; idx < 33; ++idx) {
+			set = (m_defaultBoard >> idx) & 1;
+			if (set) {
+				// If the bit is set, the field is occupied
+				m_boardRepresentation.push_back(Field{ FieldState::Occupied, m_idxToGridMap.at(idx) });
+			}
+			else {
+				// If the bit is not set, the field is empty
+				m_boardRepresentation.push_back(Field{ FieldState::Empty, m_idxToGridMap.at(idx) });
 			}
 		}
 	}
 
 	ArrowUpBoard() {
-		// Initialize the English board representation
-		m_boardType = BoardType::ArrowUp;
-		m_boardRepresentation.resize(17);
+		// Initialize the ArrowUp board representation
+		m_defaultBoard = 0x1F8810FBA;
+		m_idxToGridMap = {
+		{0, std::make_pair(0,2)}, {1, std::make_pair(0,3)}, {2, std::make_pair(0,4)},
+		{3, std::make_pair(1,2)}, {4, std::make_pair(1,3)}, {5, std::make_pair(1,4)},
+		{6, std::make_pair(2,0)}, {7, std::make_pair(2,1)}, {8, std::make_pair(2,2)}, {9, std::make_pair(2,3)}, {10, std::make_pair(2,4)}, {11, std::make_pair(2,5)}, {12, std::make_pair(2,6)},
+		{13, std::make_pair(3,0)}, {14, std::make_pair(3,1)}, {15, std::make_pair(3,2)}, {16, std::make_pair(3,3)}, {17, std::make_pair(3,4)}, {18, std::make_pair(3,5)}, {19, std::make_pair(3,6)},
+		{20, std::make_pair(4,0)}, {21, std::make_pair(4,1)}, {22, std::make_pair(4,2)}, {23, std::make_pair(4,3)}, {24, std::make_pair(4,4)}, {25, std::make_pair(4,5)}, {26, std::make_pair(4,6)},
+		{27, std::make_pair(5,2)}, {28, std::make_pair(5,3)}, {29, std::make_pair(5,4)},
+		{30, std::make_pair(6,2)}, {31, std::make_pair(6,3)}, {32, std::make_pair(6,4)},
+		};
+		m_boardRepresentation.resize(33);
 		initializeBoard();
 	}
 
@@ -328,5 +282,13 @@ public:
 			}
 		}
 		return true;
+	}
+
+	std::vector<MoveByte> getNextHint(uint64_t boardState) override {
+		ArrowUpBoardSolver solver(boardState);
+		std::chrono::milliseconds timeout(25000);
+		const std::chrono::time_point<std::chrono::system_clock> startTime = std::chrono::system_clock::now();
+		solver.solve(startTime, timeout, true);
+		return solver.getSolutionPath();
 	}
 };
